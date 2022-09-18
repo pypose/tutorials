@@ -1,4 +1,4 @@
 sphinx
 sphinx-gallery
-sphinx_rtd_theme
+pypose_sphinx_theme
 torch
