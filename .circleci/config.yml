@@ -123,6 +123,7 @@ jobs:
             export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
             conda activate pyenv 
             pip install -r requirements.txt
+            apt-get install -y python3-sphinx
             make html
       - persist_to_workspace:
           root: _build
