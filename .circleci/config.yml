@@ -119,7 +119,9 @@ jobs:
       - checkout
       - run: 
           name: Build PyPose tutorials
-          command: make html
+          command: |
+            pip install -r requirements.txt
+            make html
       - persist_to_workspace:
           root: _build
           paths: [html]
