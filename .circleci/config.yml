@@ -72,6 +72,7 @@ commands:
             export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
             conda activate pyenv
             export MAX_JOBS=<< parameters.max_jobs >>
+            cd /tmp
             git clone --recursive https://github.com/pypose/pypose.git && cd pypose
             mkdir -p dist
             python3 setup.py egg_info --tag-build=<< parameters.build_tag >> << parameters.dist_type >>
@@ -96,7 +97,7 @@ jobs:
           path: dist
           destination: wheels
       - persist_to_workspace:
-          root: .
+          root: /tmp/pypose
           paths: [dist]
   build_tutorials:
     <<: *build_binary_params
@@ -106,20 +107,22 @@ jobs:
     steps:
       - setup_env
       - attach_workspace:
-          at: .
+          at: /tmp/pypose
       - run:
           name: Install PyPose 
           command: |
+            cd /tmp/pypose
             export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
             conda activate pyenv
             pip install dist/pypose-*.whl
+            cd ~/project
       - checkout
       - run: 
           name: Build PyPose tutorials
           command: make html
       - persist_to_workspace:
           root: _build
-          paths: html
+          paths: [html]
   deploy_tutorials:
     docker:
       - image: node:8.10.0
