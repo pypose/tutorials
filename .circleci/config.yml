@@ -28,29 +28,29 @@ build_binary_params: &build_binary_params
     TORCH_VERSION: << parameters.torch_version >>
 
 commands:
-  # git_update_submodules: &git_update_submodules
-  #   description: Update submodules of clone
-  #   steps:
-  #     - run:
-  #         name: Update submodule
-  #         command: git submodule sync && git submodule update --init
-  # setup_env: &setup_env
-  #   description: Setup the build environment
-  #   steps:
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # derived environment variables
-  #           export CUDA_VERSION_SHORT=$(echo ${CUDA_VERSION} | sed -E 's/([0-9]+)\.([0-9]+).*/\1.\2/')
-  #           # apt-get and conda
-  #           apt-get update -y
-  #           DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl git-all ninja-build
-  #           cd /tmp
-  #           wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-  #           chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b
-  #           export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-  #           # python dependencies
-  #           conda create -n pyenv -y python=${PYTHON_VERSION} setuptools pytorch=${TORCH_VERSION} cudatoolkit=${CUDA_VERSION_SHORT} -c pytorch
+  git_update_submodules: &git_update_submodules
+    description: Update submodules of clone
+    steps:
+      - run:
+          name: Update submodule
+          command: git submodule sync && git submodule update --init
+  setup_env: &setup_env
+    description: Setup the build environment
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            # derived environment variables
+            export CUDA_VERSION_SHORT=$(echo ${CUDA_VERSION} | sed -E 's/([0-9]+)\.([0-9]+).*/\1.\2/')
+            # apt-get and conda
+            apt-get update -y
+            DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl git-all ninja-build
+            cd /tmp
+            wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+            chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            # python dependencies
+            conda create -n pyenv -y python=${PYTHON_VERSION} setuptools pytorch=${TORCH_VERSION} cudatoolkit=${CUDA_VERSION_SHORT} -c pytorch
   build_package: &build_package
     description: Build PyPose package of specified type
     parameters:
@@ -69,8 +69,8 @@ commands:
           no_output_timeout: 30m
           command: |
             echo $PATH
-            # export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            # conda activate pyenv
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            conda activate pyenv
             export MAX_JOBS=<< parameters.max_jobs >>
             cd /tmp
             git clone --recursive https://github.com/pypose/pypose.git
@@ -83,12 +83,12 @@ jobs:
   # linux_build_wheel:
   #   <<: *build_binary_params
   #   docker:
-  #     - image: pytorch/pytorch:1.12.1-cuda<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel
+  #     - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
   #   resource_class: large
   #   steps:
   #     - setup_remote_docker:
   #         docker_layer_caching: true
-  #     # - setup_env
+  #     - setup_env
   #     # - checkout
   #     # - git_update_submodules
   #     - build_package
@@ -101,19 +101,30 @@ jobs:
   build_tutorials:
     <<: *build_binary_params
     docker:
-      - image: pytorch/pytorch:1.12.1-cuda<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel
-    resource_class: gpu.nvidia.small
+      - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
+    resource_class: large
     steps:
-      # - setup_env
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - run:
+          name: Test CUDA
+          command: nvidia-smi
+      - setup_env
+      # - attach_workspace:
+      #     at: /tmp/pypose
       - build_package
+      # - run:
+      #     name: Install PyPose 
+      #     command: |
+      #       cd /tmp/pypose
+      #       export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+      #       conda activate pyenv
+      #       pip install dist/pypose-*.whl
+      #       cd ~/project
       - checkout
       - run: 
           name: Build PyPose tutorials
           command: |
-            # export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            # conda activate pyenv 
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            conda activate pyenv 
             pip install -r requirements.txt
             apt-get install -y python3-sphinx
             make html
