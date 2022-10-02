@@ -1,0 +1,167 @@
+version: 2.1
+
+##############################################################################
+# Reusables
+##############################################################################
+build_binary_params: &build_binary_params
+  parameters:
+    docker_image:
+      type: string
+      default: ""
+    cuda_version:
+      type: string
+      default: ""
+    cudnn_version:
+      type: string
+      default: "8"
+    python_version:
+      type: string
+      default: ""
+    torch_version:
+      type: string
+      default: ""
+  environment:
+    DOCKER_IMAGE: << parameters.docker_image >>
+    CUDA_VERSION: << parameters.cuda_version >>
+    CUDNN_VERSION: << parameters.cudnn_version >>
+    PYTHON_VERSION: << parameters.python_version >>
+    TORCH_VERSION: << parameters.torch_version >>
+
+commands:
+  git_update_submodules: &git_update_submodules
+    description: Update submodules of clone
+    steps:
+      - run:
+          name: Update submodule
+          command: git submodule sync && git submodule update --init
+  setup_env: &setup_env
+    description: Setup the build environment
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            # derived environment variables
+            export CUDA_VERSION_SHORT=$(echo ${CUDA_VERSION} | sed -E 's/([0-9]+)\.([0-9]+).*/\1.\2/')
+            # apt-get and conda
+            apt-get update -y
+            DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl git-all ninja-build
+            cd /tmp
+            wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+            chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            # python dependencies
+            conda create -n pyenv -y python=${PYTHON_VERSION} setuptools pytorch=${TORCH_VERSION} cudatoolkit=${CUDA_VERSION_SHORT} -c pytorch
+  build_package: &build_package
+    description: Build PyPose package of specified type
+    parameters:
+      build_tag:
+        type: string
+        default: "dev"
+      dist_type:
+        type: string
+        default: "bdist_wheel"
+      max_jobs:
+        type: integer
+        default: 1
+    steps:
+      - run:
+          name: Build PyPose package (<< parameters.dist_type >>)
+          no_output_timeout: 30m
+          command: |
+            echo $PATH
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            conda activate pyenv
+            export MAX_JOBS=<< parameters.max_jobs >>
+            git clone --recursive https://github.com/pypose/pypose.git && cd pypose
+            mkdir -p dist
+            python3 setup.py egg_info --tag-build=<< parameters.build_tag >> << parameters.dist_type >>
+
+##############################################################################
+# Job specs
+##############################################################################
+jobs:
+  linux_build_wheel:
+    <<: *build_binary_params
+    docker:
+      - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
+    resource_class: large
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - setup_env
+      # - checkout
+      # - git_update_submodules
+      - build_package
+      - store_artifacts:
+          path: dist
+          destination: wheels
+      - persist_to_workspace:
+          root: .
+          paths: [dist]
+  build_tutorials:
+    <<: *build_binary_params
+    docker:
+      - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
+    resource_class: medium
+    steps:
+      - setup_env
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install PyPose 
+          command: |
+            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            conda activate pyenv
+            pip install dist/pypose-*.whl
+      - checkout
+      - run:
+          name: Build PyPose tutorials
+          command: make html
+          - persist_to_workspace:
+            root: _build
+            paths: html
+
+    docs-deploy:
+      docker:
+        - image: node:8.10.0
+      steps:
+        - checkout
+        - attach_workspace:
+            at: _build
+        - run:
+            name: Disable jekyll builds
+            command: touch _build/html/.nojekyll
+        - run:
+            name: Install and configure dependencies
+            command: |
+              npm install -g --silent gh-pages@2.0.1
+              git config user.email "253750329@qq.com"
+              git config user.name "ew123"
+        - add_ssh_keys:
+            fingerprints:
+              - "59:ad:fd:64:71:eb:81:01:6a:d7:1a:c9:0c:19:39:af"
+        - run:
+            name: Deploy docs to gh-pages branch
+            command: gh-pages --dotfiles --message "[skip ci] Updates" --dist _build/html
+
+##############################################################################
+# Workflows
+##############################################################################
+workflows:
+  version: 2
+  build:
+    jobs:
+      - linux_build_wheel:
+          cuda_version: "11.3.1"
+          torch_version: "1.12.1"
+          python_version: "3.8"
+      - build_tutorials:
+          requires: [linux_build_wheel]
+          cuda_version: "11.3.1"
+          torch_version: "1.11.0"
+          python_version: "3.8"
+      - deploy_tutorials:
+          requires: [linux_build_wheel, build_tutorials]
+          filters:
+            branches:
+              only: main
