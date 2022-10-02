@@ -28,29 +28,29 @@ build_binary_params: &build_binary_params
     TORCH_VERSION: << parameters.torch_version >>
 
 commands:
-  git_update_submodules: &git_update_submodules
-    description: Update submodules of clone
-    steps:
-      - run:
-          name: Update submodule
-          command: git submodule sync && git submodule update --init
-  setup_env: &setup_env
-    description: Setup the build environment
-    steps:
-      - run:
-          name: Install dependencies
-          command: |
-            # derived environment variables
-            export CUDA_VERSION_SHORT=$(echo ${CUDA_VERSION} | sed -E 's/([0-9]+)\.([0-9]+).*/\1.\2/')
-            # apt-get and conda
-            apt-get update -y
-            DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl git-all ninja-build
-            cd /tmp
-            wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-            chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b
-            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            # python dependencies
-            conda create -n pyenv -y python=${PYTHON_VERSION} setuptools pytorch=${TORCH_VERSION} cudatoolkit=${CUDA_VERSION_SHORT} -c pytorch
+  # git_update_submodules: &git_update_submodules
+  #   description: Update submodules of clone
+  #   steps:
+  #     - run:
+  #         name: Update submodule
+  #         command: git submodule sync && git submodule update --init
+  # setup_env: &setup_env
+  #   description: Setup the build environment
+  #   steps:
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # derived environment variables
+  #           export CUDA_VERSION_SHORT=$(echo ${CUDA_VERSION} | sed -E 's/([0-9]+)\.([0-9]+).*/\1.\2/')
+  #           # apt-get and conda
+  #           apt-get update -y
+  #           DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl git-all ninja-build
+  #           cd /tmp
+  #           wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  #           chmod +x Miniconda3-latest-Linux-x86_64.sh && ./Miniconda3-latest-Linux-x86_64.sh -b
+  #           export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+  #           # python dependencies
+  #           conda create -n pyenv -y python=${PYTHON_VERSION} setuptools pytorch=${TORCH_VERSION} cudatoolkit=${CUDA_VERSION_SHORT} -c pytorch
   build_package: &build_package
     description: Build PyPose package of specified type
     parameters:
@@ -69,59 +69,51 @@ commands:
           no_output_timeout: 30m
           command: |
             echo $PATH
-            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            conda activate pyenv
+            # export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            # conda activate pyenv
             export MAX_JOBS=<< parameters.max_jobs >>
             cd /tmp
-            git clone --recursive https://github.com/pypose/pypose.git && cd pypose
-            mkdir -p dist
-            python3 setup.py egg_info --tag-build=<< parameters.build_tag >> << parameters.dist_type >>
+            git clone --recursive https://github.com/pypose/pypose.git
+            cd pypose && python setup.py develop
 
 ##############################################################################
 # Job specs
 ##############################################################################
 jobs:
-  linux_build_wheel:
-    <<: *build_binary_params
-    docker:
-      - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
-    resource_class: large
-    steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - setup_env
-      # - checkout
-      # - git_update_submodules
-      - build_package
-      - store_artifacts:
-          path: dist
-          destination: wheels
-      - persist_to_workspace:
-          root: /tmp/pypose
-          paths: [dist]
+  # linux_build_wheel:
+  #   <<: *build_binary_params
+  #   docker:
+  #     - image: pytorch/pytorch:1.12.1-cuda<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel
+  #   resource_class: large
+  #   steps:
+  #     - setup_remote_docker:
+  #         docker_layer_caching: true
+  #     # - setup_env
+  #     # - checkout
+  #     # - git_update_submodules
+  #     - build_package
+  #     - store_artifacts:
+  #         path: dist
+  #         destination: wheels
+  #     - persist_to_workspace:
+  #         root: /tmp/pypose
+  #         paths: [dist]
   build_tutorials:
     <<: *build_binary_params
     docker:
-      - image: nvidia/cuda:<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel-ubuntu20.04
-    resource_class: medium
+      - image: pytorch/pytorch:1.12.1-cuda<< parameters.cuda_version >>-cudnn<< parameters.cudnn_version >>-devel
+    resource_class: gpu.nvidia.small
     steps:
-      - setup_env
-      - attach_workspace:
-          at: /tmp/pypose
-      - run:
-          name: Install PyPose 
-          command: |
-            cd /tmp/pypose
-            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            conda activate pyenv
-            pip install dist/pypose-*.whl
-            cd ~/project
+      # - setup_env
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - build_package
       - checkout
       - run: 
           name: Build PyPose tutorials
           command: |
-            export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
-            conda activate pyenv 
+            # export "PATH=~/miniconda3/bin:$PATH" && conda init bash && . $HOME/miniconda3/etc/profile.d/conda.sh
+            # conda activate pyenv 
             pip install -r requirements.txt
             apt-get install -y python3-sphinx
             make html
@@ -158,17 +150,16 @@ workflows:
   version: 2
   build:
     jobs:
-      - linux_build_wheel:
-          cuda_version: "11.3.1"
-          torch_version: "1.12.1"
-          python_version: "3.8"
+      # - linux_build_wheel:
+      #     cuda_version: "11.3.1"
+      #     torch_version: "1.12.1"
+      #     python_version: "3.8"
       - build_tutorials:
-          requires: [linux_build_wheel]
           cuda_version: "11.3.1"
           torch_version: "1.11.0"
           python_version: "3.8"
       - deploy_tutorials:
-          requires: [linux_build_wheel, build_tutorials]
+          requires: [build_tutorials]
           filters:
             branches:
               only: main
