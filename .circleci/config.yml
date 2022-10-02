@@ -120,6 +120,7 @@ jobs:
       - run: 
           name: Build PyPose tutorials
           command: |
+            conda activate pyenv
             pip install -r requirements.txt
             make html
       - persist_to_workspace:
