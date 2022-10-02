@@ -1,4 +1,3 @@
-sphinx
+python3-sphinx
 sphinx-gallery
 pypose_sphinx_theme
-torch
