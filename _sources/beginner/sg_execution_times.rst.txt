@@ -1,0 +1,12 @@
+
+:orphan:
+
+.. _sphx_glr_beginner_sg_execution_times:
+
+Computation times
+=================
+**00:02.010** total execution time for **beginner** files:
+
++----------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_beginner_lietensor_tutorial.py` (``lietensor_tutorial.py``) | 00:02.010 | 0.0 MB |
++----------------------------------------------------------------------------+-----------+--------+
