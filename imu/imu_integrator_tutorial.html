@@ -1,0 +1,594 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>IMU Integrator Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Pose Graph Optimization Tutorial" href="../pgo/pgo_tutorial.html" />
+    <link rel="prev" title="IMU Corrector Tutorial" href="imu_corrector_tutorial.html" />
+  <!-- Google Analytics -->
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pypose.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pypose.org/">Get Started</a>
+          </li>
+
+          <!-- <li> -->
+          <li>
+            <a href="https://pypose.org/tutorials">Tutorials</a>
+          </li>
+
+          <!-- <li> -->
+          <li>
+            <a href="https://pypose.org/docs/main/index.html">Doc</a>
+          </li>
+
+          <li>
+            <a href="https://pypose.org/">About Us</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pypose/pypose">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Introduction to PyPose</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/lietensor_tutorial.html">LieTensor Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dynamics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics/cartpole_tutorial.html">Cartpole Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics/floquet_tutorial.html">Floquet Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics/neuralnet_tutorial.html">NeuralNet Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">IMU</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">IMU Integrator Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pose Graph Optimization</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pgo/pgo_tutorial.html">Pose Graph Optimization Tutorial</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>IMU Integrator Tutorial</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/imu/imu_integrator_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-imu-imu-integrator-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="imu-integrator-tutorial">
+<span id="sphx-glr-imu-imu-integrator-tutorial-py"></span><h1>IMU Integrator Tutorial<a class="headerlink" href="#imu-integrator-tutorial" title="Permalink to this heading">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="nn">Data</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
+<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">PatchCollection</span>
+<span class="kn">from</span> <span class="nn">imu_dataset</span> <span class="kn">import</span> <span class="n">KITTI_IMU</span><span class="p">,</span> <span class="n">imu_collate</span><span class="p">,</span> <span class="n">move_to</span>
+</pre></div>
+</div>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_gaussian</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">covs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Set specific color to show edges, otherwise same with facecolor.&#39;&#39;&#39;</span>
+    <span class="n">ellipses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">means</span><span class="p">)):</span>
+        <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">covs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eigvals</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span>
+        <span class="n">slope</span> <span class="o">=</span> <span class="n">eigvecs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">eigvecs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="mf">180.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">ellipses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ellipse</span><span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">PatchCollection</span><span class="p">(</span><span class="n">ellipses</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Define Parameters</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;IMU Preintegration&#39;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--device&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;cuda or cpu&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--integrating-step&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of integrated steps&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--batch-size&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;batch size, only support 1 now&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--step-size&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the size of the integration for one interval&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--save&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/save/&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;location of png files to save&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataroot&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset location downloaded&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataname&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2011_09_26&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset name&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--datadrive&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0001&quot;</span><span class="p">,</span><span class="s2">&quot;0002&quot;</span><span class="p">,</span><span class="s2">&quot;0005&quot;</span><span class="p">,</span><span class="s2">&quot;0009&quot;</span><span class="p">,</span><span class="s2">&quot;0011&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;0013&quot;</span><span class="p">,</span><span class="s2">&quot;0014&quot;</span><span class="p">,</span><span class="s2">&quot;0015&quot;</span><span class="p">,</span><span class="s2">&quot;0017&quot;</span><span class="p">,</span><span class="s2">&quot;0018&quot;</span><span class="p">,</span><span class="s2">&quot;0019&quot;</span><span class="p">,</span><span class="s2">&quot;0020&quot;</span><span class="p">,</span><span class="s2">&quot;0022&quot;</span><span class="p">,</span><span class="s2">&quot;0005&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;data sequences&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--plot3d&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;plot3d&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;plot in 3D space, default: False&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">plot3d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">();</span> <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">set_default_tensor_type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">DoubleTensor</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">datadrive</span><span class="p">:</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">KITTI_IMU</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dataroot</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;evaluate&#39;</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">imu_collate</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">init</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_init_value</span><span class="p">()</span>
+    <span class="n">integrator</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">IMUPreintegrator</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span> <span class="n">init</span><span class="p">[</span><span class="s1">&#39;rot&#39;</span><span class="p">],</span> <span class="n">init</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">poses</span><span class="p">,</span> <span class="n">poses_gt</span> <span class="o">=</span> <span class="p">[</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]]</span>
+    <span class="n">covs</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">move_to</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">state</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">gyro</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gyro&#39;</span><span class="p">],</span> <span class="n">acc</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">],</span> <span class="n">rot</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;init_rot&#39;</span><span class="p">])</span>
+        <span class="n">poses_gt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gt_pos&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">covs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+    <span class="n">poses</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">poses</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">poses_gt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">covs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">covs</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot3d</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">plot_gaussian</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">covs</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PyPose IMU Integrator&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;PyPose&quot;</span><span class="p">,</span> <span class="s2">&quot;Ground Truth&quot;</span><span class="p">])</span>
+    <span class="n">figure</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">drive</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved to&quot;</span><span class="p">,</span> <span class="n">figure</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_001.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_001.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_002.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_002.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_003.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_003.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_004.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_004.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_005.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_005.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_006.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_006.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_007.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_007.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_008.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_008.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_009.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_009.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_010.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_010.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_011.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_011.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_012.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_012.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_013.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_013.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_imu_integrator_tutorial_014.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_014.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
+</ul>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Namespace(device=&#39;cpu&#39;, integrating_step=1, batch_size=1, step_size=2, save=&#39;../dataset/save/&#39;, dataroot=&#39;../dataset/&#39;, dataname=&#39;2011_09_26&#39;, datadrive=[&#39;0001&#39;, &#39;0002&#39;, &#39;0005&#39;, &#39;0009&#39;, &#39;0011&#39;, &#39;0013&#39;, &#39;0014&#39;, &#39;0015&#39;, &#39;0017&#39;, &#39;0018&#39;, &#39;0019&#39;, &#39;0020&#39;, &#39;0022&#39;, &#39;0005&#39;], plot3d=False)
+Saved to ../dataset/save/2011_09_26_0001.png
+Saved to ../dataset/save/2011_09_26_0002.png
+Saved to ../dataset/save/2011_09_26_0005.png
+Saved to ../dataset/save/2011_09_26_0009.png
+Saved to ../dataset/save/2011_09_26_0011.png
+Saved to ../dataset/save/2011_09_26_0013.png
+Saved to ../dataset/save/2011_09_26_0014.png
+Saved to ../dataset/save/2011_09_26_0015.png
+Saved to ../dataset/save/2011_09_26_0017.png
+Saved to ../dataset/save/2011_09_26_0018.png
+Saved to ../dataset/save/2011_09_26_0019.png
+Saved to ../dataset/save/2011_09_26_0020.png
+Saved to ../dataset/save/2011_09_26_0022.png
+Saved to ../dataset/save/2011_09_26_0005.png
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.224 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-imu-imu-integrator-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/7757467eff38094f3de15b5f207bda6e/imu_integrator_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">imu_integrator_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/cd24e81657a2426307ca338be762ac0d/imu_integrator_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">imu_integrator_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../pgo/pgo_tutorial.html" class="btn btn-neutral float-right" title="Pose Graph Optimization Tutorial" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="imu_corrector_tutorial.html" class="btn btn-neutral" title="IMU Corrector Tutorial" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, PyPose contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
+                </li>
+              <ul>
+
+              <ul>
+<li><a class="reference internal" href="#">IMU Integrator Tutorial</a><ul>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access documentation for PyPose</p>
+          <a class="with-right-arrow" href="https://pypose.org/docs/main/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get started with tutorials and examples</p>
+          <a class="with-right-arrow" href="https://pypose.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Get Started</h2>
+          <p>Find resources and how to start using pypose</p>
+          <a class="with-right-arrow" href="https://pypose.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pypose.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pypose.org/">Pypose</a></li>
+            <li><a href="https://pypose.org/get-started">Get Started</a></li>
+            <li><a href="https://pypose.org/features">Features</a></li>
+            <li><a href="https://github.com/pypose/pypose/blob/main/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pypose.org/resources">Resources</a></li>
+            <li><a href="https://pypose.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pypose.org/docs/main/index.html">Docs</a></li>
+            <li><a href="https://github.com/pypose/pypose/issues" target="_blank">Github Issues</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://twitter.com/pypose_org" target="_blank">Twitter</a></li>
+            <li><a href="https://github.com/pypose/pypose" target="_blank">GitHub</a></li>
+
+          </ul>  
+          </div>
+        </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pypose.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pypose.org/get-started">Get Started</a>
+          </li>
+          <li>
+            <a href="https://pypose.org/tutorials">Tutorials</a>
+          </li>
+          <li>
+            <a href="https://pypose.org/docs/main/index.html">Docs</a>
+          </li>
+          <li>
+            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+          </li>
+          <li>
+            <a href="https://github.com/pypose/pypose">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

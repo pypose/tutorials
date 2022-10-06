@@ -65,19 +65,19 @@ LieTensor Tutorial
  .. code-block:: none
 
     a: so3Type LieTensor:
-    LieTensor([[ 0.0715,  0.1534,  1.0294],
-               [ 1.2860,  0.7816, -0.9997]]) 
+    LieTensor([[-2.2638, -0.4771,  1.5078],
+               [ 0.3542, -0.3725, -1.3291]]) 
     x.shape: torch.Size([2, 1, 7]) 
     x.gshape: torch.Size([2, 1])
     SE3Type LieTensor:
     LieTensor([[0., 0., 0., 0., 0., 0., 1.],
                [0., 0., 0., 0., 0., 0., 1.]])
     se3Type LieTensor:
-    LieTensor([[[ 0.0692,  1.4889,  0.4124, -0.3089, -0.8641, -1.4701],
-                [-0.1599,  0.7383,  1.2609, -1.9158,  2.0443,  0.0761]],
+    LieTensor([[[ 0.5694,  1.6048,  0.1480,  0.6726, -0.5059, -0.9744],
+                [ 0.2694,  0.3830,  0.2743,  1.0604,  0.3516, -0.1946]],
 
-               [[-1.4283, -1.4922, -0.1223, -0.9169,  1.1653, -1.3378],
-                [ 1.1604,  0.5560,  0.4367,  0.1432,  0.5526,  1.2847]]])
+               [[-2.1244,  0.7299, -2.5000,  0.6875, -0.7015, -0.2474],
+                [-1.1213, -0.7150,  1.6552, -1.8409,  0.7483, -0.2629]]])
 
 
 
@@ -110,13 +110,13 @@ All arguments in PyTorch are supported
 
 
     (SO3Type LieTensor:
-    LieTensor([[-0.4175, -0.0036, -0.0734,  0.9057],
-               [-0.5080,  0.1298, -0.0486,  0.8501],
-               [-0.4618, -0.5467,  0.0525,  0.6965]], device='cuda:0',
+    LieTensor([[ 0.2429,  0.2401,  0.2155,  0.9148],
+               [-0.5643,  0.1867,  0.5538,  0.5831],
+               [-0.3532, -0.7846,  0.2573,  0.4399]], device='cuda:0',
               dtype=torch.float64, requires_grad=True), SO3Type LieTensor:
-    LieTensor([[-0.4175, -0.0036, -0.0734,  0.9057],
-               [-0.5080,  0.1298, -0.0486,  0.8501],
-               [-0.4618, -0.5467,  0.0525,  0.6965]], device='cuda:0',
+    LieTensor([[ 0.2429,  0.2401,  0.2155,  0.9148],
+               [-0.5643,  0.1867,  0.5538,  0.5831],
+               [-0.3532, -0.7846,  0.2573,  0.4399]], device='cuda:0',
               grad_fn=<AliasBackward0>))
 
 
@@ -188,11 +188,11 @@ All arguments in PyTorch are supported
 
 
     se3Type LieTensor:
-    LieTensor([[[-0.0692, -1.4889, -0.4124,  0.3089,  0.8641,  1.4701],
-                [ 0.1599, -0.7383, -1.2609,  1.9158, -2.0443, -0.0761]],
+    LieTensor([[[-0.5694, -1.6048, -0.1480, -0.6726,  0.5059,  0.9744],
+                [-0.2694, -0.3830, -0.2743, -1.0604, -0.3516,  0.1946]],
 
-               [[ 1.4283,  1.4922,  0.1223,  0.9169, -1.1653,  1.3378],
-                [-1.1604, -0.5560, -0.4367, -0.1432, -0.5526, -1.2847]]])
+               [[ 2.1244, -0.7299,  2.5000, -0.6875,  0.7015,  0.2474],
+                [ 1.1213,  0.7150, -1.6552,  1.8409, -0.7483,  0.2629]]])
 
 
 
@@ -260,15 +260,15 @@ All arguments in PyTorch are supported
  .. code-block:: none
 
 
-    (tensor(0.0710, device='cuda:0', grad_fn=<SumBackward0>), tensor([[ 0.1495, -0.2627, -0.0877],
-            [-0.2269,  0.2133, -0.0618],
-            [-0.0019, -0.1569, -0.2441]], device='cuda:0'), so3Type LieTensor:
-    LieTensor([[ 0.0747, -0.1313, -0.0438],
-               [-0.1135,  0.1067, -0.0309],
-               [-0.0009, -0.0785, -0.1221]], device='cuda:0', requires_grad=True), so3Type LieTensor:
-    LieTensor([[ 0.0747, -0.1313, -0.0438],
-               [-0.1135,  0.1067, -0.0309],
-               [-0.0009, -0.0785, -0.1221]], device='cuda:0'))
+    (tensor(0.1205, device='cuda:0', grad_fn=<SumBackward0>), tensor([[-0.0977, -0.0482, -0.1812],
+            [ 0.1555, -0.3701, -0.1870],
+            [-0.1725,  0.2448, -0.3887]], device='cuda:0'), so3Type LieTensor:
+    LieTensor([[-0.0488, -0.0241, -0.0906],
+               [ 0.0777, -0.1852, -0.0935],
+               [-0.0862,  0.1224, -0.1945]], device='cuda:0', requires_grad=True), so3Type LieTensor:
+    LieTensor([[-0.0488, -0.0241, -0.0906],
+               [ 0.0777, -0.1852, -0.0935],
+               [-0.0862,  0.1224, -0.1945]], device='cuda:0'))
 
 
 
@@ -326,23 +326,23 @@ All arguments in PyTorch are supported
     Before Optimization:
      so3Type Parameter:
     Parameter containing:
-    Parameter(Parameter([[ 0.1939,  0.5800,  0.3151],
-               [-0.4851, -1.8635, -1.6563],
-               [-0.3857,  0.6101,  0.9108],
-               [ 0.2577,  0.1659,  1.9587]], device='cuda:0', requires_grad=True))
-    tensor(6.8084, device='cuda:0', grad_fn=<SumBackward0>)
-    tensor(7.1588, device='cuda:0', grad_fn=<SumBackward0>)
-    tensor(6.7525, device='cuda:0', grad_fn=<SumBackward0>)
-    tensor(6.8900, device='cuda:0', grad_fn=<SumBackward0>)
-    tensor(7.2370, device='cuda:0', grad_fn=<SumBackward0>)
+    Parameter(Parameter([[ 0.9853,  0.7453,  0.5795],
+               [ 1.0430, -0.9287,  0.6975],
+               [-0.0814,  0.8786,  0.7938],
+               [ 2.4384,  1.2223, -1.2418]], device='cuda:0', requires_grad=True))
+    tensor(7.1409, device='cuda:0', grad_fn=<SumBackward0>)
+    tensor(6.8957, device='cuda:0', grad_fn=<SumBackward0>)
+    tensor(6.7648, device='cuda:0', grad_fn=<SumBackward0>)
+    tensor(6.3195, device='cuda:0', grad_fn=<SumBackward0>)
+    tensor(7.0756, device='cuda:0', grad_fn=<SumBackward0>)
     Parameter: 12
     After Optimization:
      so3Type Parameter:
     Parameter containing:
-    Parameter(Parameter([[-0.3821, -0.0452, -0.0019],
-               [-0.5272, -0.6633, -0.4910],
-               [-1.3067,  1.0494,  0.4543],
-               [-0.0779,  0.3724,  0.8483]], device='cuda:0', requires_grad=True))
+    Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
+               [ 0.3458,  0.1767,  0.1380],
+               [ 0.0524,  0.1763,  0.6429],
+               [ 2.2414,  0.5162, -1.1565]], device='cuda:0', requires_grad=True))
 
 
 
@@ -350,7 +350,7 @@ All arguments in PyTorch are supported
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.010 seconds)
+   **Total running time of the script:** ( 0 minutes  1.786 seconds)
 
 
 .. _sphx_glr_download_beginner_lietensor_tutorial.py:
