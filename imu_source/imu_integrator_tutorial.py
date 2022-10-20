@@ -15,7 +15,7 @@ import torch.utils.data as Data
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.collections import PatchCollection
-from imu_dataset import KITTI_IMU, imu_collate, move_to
+from imu_dataset_tutorial import KITTI_IMU, imu_collate, move_to
 
 
 ######################################################################
@@ -42,8 +42,8 @@ parser.add_argument("--device", type=str, default='cpu', help="cuda or cpu")
 parser.add_argument("--integrating-step", type=int, default=1, help="number of integrated steps")
 parser.add_argument("--batch-size", type=int, default=1, help="batch size, only support 1 now")
 parser.add_argument("--step-size", type=int, default=2, help="the size of the integration for one interval")
-parser.add_argument("--save", type=str, default='./examples/module/imu/save/', help="location of png files to save")
-parser.add_argument("--dataroot", type=str, default='./examples/module/imu/', help="dataset location downloaded")
+parser.add_argument("--save", type=str, default='../dataset/save/', help="location of png files to save")
+parser.add_argument("--dataroot", type=str, default='../dataset/', help="dataset location downloaded")
 parser.add_argument("--dataname", type=str, default='2011_09_26', help="dataset name")
 parser.add_argument("--datadrive", nargs='+', type=str, default=["0001","0002","0005","0009","0011",
                     "0013","0014","0015","0017","0018","0019","0020","0022","0005"], help="data sequences")

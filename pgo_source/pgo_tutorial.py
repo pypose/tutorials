@@ -10,7 +10,7 @@ import torch
 import argparse
 import pypose as pp
 from torch import nn
-from pgo_dataset import G2OPGO
+from pgo_dataset_tutorial import G2OPGO
 import matplotlib.pyplot as plt
 import pypose.optim.solver as ppos
 import pypose.optim.kernel as ppok
@@ -20,8 +20,9 @@ from pypose.optim.scheduler import StopOnPlateau
 
 
 ######################################################################
-# Preparation
-# ------------
+# Define Pose Graph
+# ------------------
+
 class PoseGraph(nn.Module):
 
     def __init__(self, nodes):
@@ -54,17 +55,21 @@ def plot_and_save(points, pngname, title='', axlim=None):
 parser = argparse.ArgumentParser(description='Pose Graph Optimization')
 parser.add_argument("--device", type=str, default='cuda:0', help="cuda or cpu")
 parser.add_argument("--radius", type=float, default=1e4, help="trust region radius")
-parser.add_argument("--save", type=str, default='./examples/module/pgo/save/', help="files location to save")
-parser.add_argument("--dataroot", type=str, default='./examples/module/pgo/pgodata', help="dataset location")
+parser.add_argument("--save", type=str, default='../dataset/pgo/save/', help="files location to save")
+parser.add_argument("--dataroot", type=str, default='../dataset/pgo', help="dataset location")
 parser.add_argument("--dataname", type=str, default='parking-garage.g2o', help="dataset name")
 parser.add_argument('--no-vectorize', dest='vectorize', action='store_false', help="to save memory")
 parser.add_argument('--vectorize', action='store_true', help='to accelerate computation')
-parser.set_defaults(vectorize=True)
+parser.set_defaults(vectorize=False)
 args = parser.parse_args(); print(args)
 os.makedirs(os.path.join(args.save), exist_ok=True)
 
 data = G2OPGO(args.dataroot, args.dataname, device=args.device)
 edges, poses, infos = data.edges, data.poses, data.infos
+
+######################################################################
+# Define Optimizer
+# -------------------------------------------------------------
 
 graph = PoseGraph(data.nodes).to(args.device)
 solver = ppos.Cholesky()
@@ -91,4 +96,5 @@ while scheduler.continual:
 ######################################################################
 # The 2nd implementation: equivalent to the 1st one, but more compact
 # --------------------------------------------------------------------
+
 scheduler.optimize(input=(edges, poses), weight=infos)

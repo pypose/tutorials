@@ -22,7 +22,8 @@ copyright = '2022, PyPose contributors'
 author = 'PyPose contributors'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.1'
+import pypose
+version = pypose.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -36,9 +37,9 @@ extensions = [
 
 
 sphinx_gallery_conf = {
-    'examples_dirs': ['beginner_source', 'intermediate_source',
-                      'advanced_source'],
-    'gallery_dirs': ['beginner', 'intermediate', 'advanced'],
+    'examples_dirs': ['beginner_source', 'dynamics_source', 'imu_source', 
+                      'pgo_source'],
+    'gallery_dirs': ['beginner', 'dynamics', 'imu', 'pgo'],
     'filename_pattern': 'tutorial.py',
 }
 
@@ -60,7 +61,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'pypose_sphinx_theme'
 html_theme_path = [pypose_sphinx_theme.get_html_theme_path()]
-
+html_theme_options = {
+    'pytorch_project': 'tutorials',
+    'collapse_navigation': False,
+    'display_version': True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

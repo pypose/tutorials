@@ -10,12 +10,12 @@ from torch import nn
 import tqdm, argparse
 import torch.utils.data as Data
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from imu_dataset import KITTI_IMU, imu_collate, move_to
+from imu_dataset_tutorial import KITTI_IMU, imu_collate, move_to
 
 
 ######################################################################
-# Preparation
-# ------------
+# Define IMU Corrector
+# -----------------------
 
 class IMUCorrector(nn.Module):
     def __init__(self, size_list= [6, 64, 128, 128, 128, 6]):
@@ -102,7 +102,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--device", type=str, default='cuda:0', help="cuda or cpu")
 parser.add_argument("--batch-size", type=int, default=4, help="batch size")
 parser.add_argument("--max_epoches", type=int, default=100, help="max_epoches")
-parser.add_argument("--dataroot", type=str, default='./examples/module/imu', help="dataset location downloaded")
+parser.add_argument("--dataroot", type=str, default='../dataset', help="dataset location downloaded")
 parser.add_argument("--dataname", type=str, default='2011_09_26', help="dataset name")
 parser.add_argument("--datadrive", nargs='+', type=str, default=[ "0001"], help="data sequences")
 parser.add_argument('--load_ckpt', default=False, action="store_true")
@@ -114,7 +114,7 @@ train_loader = Data.DataLoader(dataset=train_dataset, batch_size=args.batch_size
 test_loader = Data.DataLoader(dataset=test_dataset, batch_size=args.batch_size, collate_fn=imu_collate, shuffle=False)
 
 ######################################################################
-# optimizer
+# Optimizer
 
 network = IMUCorrector().to(args.device)
 optimizer = torch.optim.Adam(network.parameters(), lr = 5e-6)  # to use with ViTs
