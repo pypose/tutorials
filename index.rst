@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Pypose Tutorials's documentation!
+Welcome to Pypose Tutorials
 ============================================
 
 .. toctree::
@@ -12,6 +12,26 @@ Welcome to Pypose Tutorials's documentation!
 
    beginner/lietensor_tutorial
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Dynamics
+
+   dynamics/cartpole_tutorial
+   dynamics/floquet_tutorial
+   dynamics/neuralnet_tutorial
+
+.. toctree::
+   :maxdepth: 2
+   :caption: IMU
+
+   imu/imu_corrector_tutorial
+   imu/imu_integrator_tutorial
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Pose Graph Optimization
+
+   pgo/pgo_tutorial
 
 
 

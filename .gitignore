@@ -74,6 +74,9 @@ _build
 beginner
 intermediate
 advanced
+dynamics
+imu
+pgo
 
 # PyBuilder
 target/
