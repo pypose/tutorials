@@ -61,6 +61,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'pypose_sphinx_theme'
 html_theme_path = [pypose_sphinx_theme.get_html_theme_path()]
+# html_theme_path = ['/home/tianhao/twu3/pypose_sphinx_theme']
 html_theme_options = {
     'pytorch_project': 'tutorials',
     'collapse_navigation': False,

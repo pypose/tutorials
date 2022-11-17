@@ -4,6 +4,20 @@ LieTensor Tutorial
 
 """
 
+######################################################################
+# LieTensor is the cornerstone of PyPose project. LieTensor is a subclass of
+# torch tensor that can represent Lie Algebra and Lie Group. It support all 
+# the pytorch Tensor features such as tensors on different devices, slicing 
+# and shaping, auto gradient.
+# 
+# PyPose also rewrite or add specific functions for 
+# Lie Algebra, like initialization, random LieTensor generation, Inv and Log
+# to transform between Lie Group and Lie Algebra. 
+# 
+# With LieTensor, One could easily implement robotics application with python
+# and combine deep learning techniques within.
+#
+
 import torch
 import pypose as pp
 
@@ -11,12 +25,26 @@ import pypose as pp
 ######################################################################
 # 1. Intialization
 # ---------------------------------------
+# LieTensor has different length with respect to different ltype.
+# It is recommanded to use alias to initialize LieTensor. see doc(insertlink)
 # 
 
-a = pp.so3(torch.randn(2,3))
+data = torch.randn(2, 3, requires_grad=True, device='cuda:0')
+a = pp.LieTensor(data, ltype=pp.so3_type)
+print('a:', a)
+b = pp.so3(data)
+print('b:', b)
+
+######################################################################
+# LieTensor has another an lshape attribute aside from the tensor shape.
+# The only difference from shape is the last dimension is hidden, since
+# lshape takes the last dimension as a single ltype item.
+# The last dimension can also be accessed via LieTensor.ltype.dimension.
+# 
+
 x = pp.identity_SE3(2,1)
 y = pp.randn_se3(2,2)
-print('a:', a, '\nx.shape:', x.shape, '\nx.gshape:', x.lshape)
+print('x.shape:', x.shape, '\nx.gshape:', x.lshape)
 print(x.lview(2))
 print(y)
 
@@ -24,11 +52,16 @@ print(y)
 ######################################################################
 # All arguments in PyTorch are supported
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
+# One could easily define devie, date type, and requires_grad attributes
+# just like PyTorch. 
 
 a = pp.randn_SO3(3, device="cuda:0", dtype=torch.double, requires_grad=True)
 b = pp.identity_like(a, device="cpu")
 a, b
+
+######################################################################
+# Easy data type transform is also supported
+
 t = a.float()
 a, t
 
@@ -36,7 +69,8 @@ a, t
 ######################################################################
 # 2. Slicing and Shaping
 # ---------------------------------------
-# 
+# Tensor concatination is the same as Pytorch, the last dimension 
+# is 
 
 A = pp.randn_SO3(2,2)
 B = pp.randn_SO3(2,1)
