@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>IMU Integrator Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  <title>IMU Integrator Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -76,10 +76,10 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pypose.org/">Get Started</a>
+            <a href="https://pypose.org/get-started">Get Started</a>
           </li>
 
-          <!-- <li> -->
+          <!-- <li class="active"> -->
           <li>
             <a href="https://pypose.org/tutorials">Tutorials</a>
           </li>
@@ -90,7 +90,7 @@
           </li>
 
           <li>
-            <a href="https://pypose.org/">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
 
           <li>
@@ -124,6 +124,10 @@
             
               
               
+                <div class="version">
+                  0.1.5
+                </div>
+              
             
 
             
@@ -134,7 +138,7 @@
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -161,6 +165,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">IMU Integrator Tutorial</a></li>
 </ul>
@@ -201,7 +206,7 @@
       <li>
         <a href="../index.html">
           
-            Docs
+            Tutorials
           
         </a> &gt;
       </li>
@@ -233,6 +238,28 @@
         <div class="pytorch-content-left">
 
         
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">imu/imu_integrator_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
           
           <div class="rst-content">
           
@@ -256,7 +283,7 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">PatchCollection</span>
-<span class="kn">from</span> <span class="nn">imu_dataset</span> <span class="kn">import</span> <span class="n">KITTI_IMU</span><span class="p">,</span> <span class="n">imu_collate</span><span class="p">,</span> <span class="n">move_to</span>
+<span class="kn">from</span> <span class="nn">imu_dataset_tutorial</span> <span class="kn">import</span> <span class="n">KITTI_IMU</span><span class="p">,</span> <span class="n">imu_collate</span><span class="p">,</span> <span class="n">move_to</span>
 </pre></div>
 </div>
 <section id="preparation">
@@ -360,7 +387,7 @@ Saved to ../dataset/save/2011_09_26_0022.png
 Saved to ../dataset/save/2011_09_26_0005.png
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.224 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.921 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-imu-imu-integrator-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7757467eff38094f3de15b5f207bda6e/imu_integrator_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">imu_integrator_tutorial.py</span></code></a></p>
@@ -391,7 +418,18 @@ Saved to ../dataset/save/2011_09_26_0005.png
 
   
 
-    <hr>
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
 
   
 
@@ -416,18 +454,13 @@ Saved to ../dataset/save/2011_09_26_0005.png
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-                <li>
-                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
-                </li>
-              <ul>
-
-              <ul>
 <li><a class="reference internal" href="#">IMU Integrator Tutorial</a><ul>
 <li><a class="reference internal" href="#preparation">Preparation</a></li>
 </ul>
 </li>
 </ul>
 
+              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
             </div>
           </div>
         </div>
@@ -559,7 +592,7 @@ Saved to ../dataset/save/2011_09_26_0005.png
             <a href="https://pypose.org/docs/main/index.html">Docs</a>
           </li>
           <li>
-            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
           <li>
             <a href="https://github.com/pypose/pypose">Github</a>

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pose Graph Optimization Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  <title>Pose Graph Optimization Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -75,10 +75,10 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pypose.org/">Get Started</a>
+            <a href="https://pypose.org/get-started">Get Started</a>
           </li>
 
-          <!-- <li> -->
+          <!-- <li class="active"> -->
           <li>
             <a href="https://pypose.org/tutorials">Tutorials</a>
           </li>
@@ -89,7 +89,7 @@
           </li>
 
           <li>
-            <a href="https://pypose.org/">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
 
           <li>
@@ -123,6 +123,10 @@
             
               
               
+                <div class="version">
+                  0.1.5
+                </div>
+              
             
 
             
@@ -133,7 +137,7 @@
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -160,6 +164,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
 </ul>
@@ -200,7 +205,7 @@
       <li>
         <a href="../index.html">
           
-            Docs
+            Tutorials
           
         </a> &gt;
       </li>
@@ -232,6 +237,28 @@
         <div class="pytorch-content-left">
 
         
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">pgo/pgo_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
           
           <div class="rst-content">
           
@@ -250,7 +277,7 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">pgo_dataset</span> <span class="kn">import</span> <span class="n">G2OPGO</span>
+<span class="kn">from</span> <span class="nn">pgo_dataset_tutorial</span> <span class="kn">import</span> <span class="n">G2OPGO</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pypose.optim.solver</span> <span class="k">as</span> <span class="nn">ppos</span>
 <span class="kn">import</span> <span class="nn">pypose.optim.kernel</span> <span class="k">as</span> <span class="nn">ppok</span>
@@ -259,8 +286,8 @@ to download the full example code</p>
 <span class="kn">from</span> <span class="nn">pypose.optim.scheduler</span> <span class="kn">import</span> <span class="n">StopOnPlateau</span>
 </pre></div>
 </div>
-<section id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+<section id="define-pose-graph">
+<h2>Define Pose Graph<a class="headerlink" href="#define-pose-graph" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PoseGraph</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
@@ -304,8 +331,15 @@ to download the full example code</p>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">G2OPGO</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dataroot</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 <span class="n">edges</span><span class="p">,</span> <span class="n">poses</span><span class="p">,</span> <span class="n">infos</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edges</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">poses</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">infos</span>
-
-<span class="n">graph</span> <span class="o">=</span> <span class="n">PoseGraph</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Namespace(device=&#39;cuda:0&#39;, radius=10000.0, save=&#39;../dataset/pgo/save/&#39;, dataroot=&#39;../dataset/pgo&#39;, dataname=&#39;parking-garage.g2o&#39;, vectorize=False)
+</pre></div>
+</div>
+</section>
+<section id="define-optimizer">
+<h2>Define Optimizer<a class="headerlink" href="#define-optimizer" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span> <span class="o">=</span> <span class="n">PoseGraph</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 <span class="n">solver</span> <span class="o">=</span> <span class="n">ppos</span><span class="o">.</span><span class="n">Cholesky</span><span class="p">()</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">ppost</span><span class="o">.</span><span class="n">TrustRegion</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">LM</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">solver</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">vectorize</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">vectorize</span><span class="p">)</span>
@@ -315,65 +349,30 @@ to download the full example code</p>
 <span class="n">axlim</span> <span class="o">=</span> <span class="n">plot_and_save</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">translation</span><span class="p">(),</span> <span class="n">pngname</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_pgo_tutorial_001.png" srcset="../_images/sphx_glr_pgo_tutorial_001.png" alt="parking-garage.g2o" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Namespace(device=&#39;cuda:0&#39;, radius=10000.0, save=&#39;../dataset/pgo/save/&#39;, dataroot=&#39;../dataset/pgo&#39;, dataname=&#39;parking-garage.g2o&#39;, vectorize=False)
-Saving to ../dataset/pgo/save/parking-garage.g2o.png
+<img src="../_images/sphx_glr_pgo_tutorial_001.png" srcset="../_images/sphx_glr_pgo_tutorial_001.png" alt="parking-garage.g2o" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Saving to ../dataset/pgo/save/parking-garage.g2o.png
 </pre></div>
 </div>
 </section>
 <section id="the-1st-implementation-for-customization-and-easy-to-extend">
 <h2>the 1st implementation: for customization and easy to extend<a class="headerlink" href="#the-1st-implementation-for-customization-and-easy-to-extend" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">continual</span><span class="p">:</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">poses</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="n">infos</span><span class="p">)</span>
-    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+<p>commented out because too time consumming</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># while scheduler.continual:</span>
+<span class="c1">#     loss = optimizer.step(input=(edges, poses), weight=infos)</span>
+<span class="c1">#     scheduler.step(loss)</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">steps</span><span class="p">))</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;PyPose PGO at the </span><span class="si">%d</span><span class="s1"> step(s) with loss </span><span class="si">%7f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">scheduler</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-    <span class="n">plot_and_save</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">translation</span><span class="p">(),</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">axlim</span><span class="o">=</span><span class="n">axlim</span><span class="p">)</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.pt&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_pgo_tutorial_002.png" srcset="../_images/sphx_glr_pgo_tutorial_002.png" alt="PyPose PGO at the 1 step(s) with loss 5.650377" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_003.png" srcset="../_images/sphx_glr_pgo_tutorial_003.png" alt="PyPose PGO at the 2 step(s) with loss 1.996684" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_004.png" srcset="../_images/sphx_glr_pgo_tutorial_004.png" alt="PyPose PGO at the 3 step(s) with loss 1.385963" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_005.png" srcset="../_images/sphx_glr_pgo_tutorial_005.png" alt="PyPose PGO at the 4 step(s) with loss 1.300411" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_006.png" srcset="../_images/sphx_glr_pgo_tutorial_006.png" alt="PyPose PGO at the 5 step(s) with loss 1.283956" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_007.png" srcset="../_images/sphx_glr_pgo_tutorial_007.png" alt="PyPose PGO at the 6 step(s) with loss 1.276590" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_008.png" srcset="../_images/sphx_glr_pgo_tutorial_008.png" alt="PyPose PGO at the 7 step(s) with loss 1.272300" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_009.png" srcset="../_images/sphx_glr_pgo_tutorial_009.png" alt="PyPose PGO at the 8 step(s) with loss 1.270145" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_010.png" srcset="../_images/sphx_glr_pgo_tutorial_010.png" alt="PyPose PGO at the 9 step(s) with loss 1.269167" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_pgo_tutorial_011.png" srcset="../_images/sphx_glr_pgo_tutorial_011.png" alt="PyPose PGO at the 10 step(s) with loss 1.268797" class = "sphx-glr-multi-img"/></li>
-</ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>StopOnPlateau on step 0 Loss 1.672720e+04 --&gt; Loss 5.650377e+00 (reduction/loss: 9.9966e-01).
-Saving to ../dataset/pgo/save/parking-garage.g2o_1.png
-StopOnPlateau on step 1 Loss 5.650377e+00 --&gt; Loss 1.996684e+00 (reduction/loss: 6.4663e-01).
-Saving to ../dataset/pgo/save/parking-garage.g2o_2.png
-StopOnPlateau on step 2 Loss 1.996684e+00 --&gt; Loss 1.385963e+00 (reduction/loss: 3.0587e-01).
-Saving to ../dataset/pgo/save/parking-garage.g2o_3.png
-StopOnPlateau on step 3 Loss 1.385963e+00 --&gt; Loss 1.300411e+00 (reduction/loss: 6.1728e-02).
-Saving to ../dataset/pgo/save/parking-garage.g2o_4.png
-StopOnPlateau on step 4 Loss 1.300411e+00 --&gt; Loss 1.283956e+00 (reduction/loss: 1.2654e-02).
-Saving to ../dataset/pgo/save/parking-garage.g2o_5.png
-StopOnPlateau on step 5 Loss 1.283956e+00 --&gt; Loss 1.276590e+00 (reduction/loss: 5.7364e-03).
-Saving to ../dataset/pgo/save/parking-garage.g2o_6.png
-StopOnPlateau on step 6 Loss 1.276590e+00 --&gt; Loss 1.272300e+00 (reduction/loss: 3.3609e-03).
-Saving to ../dataset/pgo/save/parking-garage.g2o_7.png
-StopOnPlateau on step 7 Loss 1.272300e+00 --&gt; Loss 1.270145e+00 (reduction/loss: 1.6936e-03).
-Saving to ../dataset/pgo/save/parking-garage.g2o_8.png
-StopOnPlateau on step 8 Loss 1.270145e+00 --&gt; Loss 1.269167e+00 (reduction/loss: 7.6989e-04).
-Saving to ../dataset/pgo/save/parking-garage.g2o_9.png
-StopOnPlateau on step 9 Loss 1.269167e+00 --&gt; Loss 1.268797e+00 (reduction/loss: 2.9202e-04).
-StopOnPlateau: Maximum steps reached, Quiting..
-Saving to ../dataset/pgo/save/parking-garage.g2o_10.png
+<span class="c1">#     name = os.path.join(args.save, args.dataname + &#39;_&#39; + str(scheduler.steps))</span>
+<span class="c1">#     title = &#39;PyPose PGO at the %d step(s) with loss %7f&#39;%(scheduler.steps, loss.item())</span>
+<span class="c1">#     plot_and_save(graph.nodes.translation(), name+&#39;.png&#39;, title, axlim=axlim)</span>
+<span class="c1">#     torch.save(graph.state_dict(), name+&#39;.pt&#39;)</span>
 </pre></div>
 </div>
 </section>
 <section id="the-2nd-implementation-equivalent-to-the-1st-one-but-more-compact">
 <h2>The 2nd implementation: equivalent to the 1st one, but more compact<a class="headerlink" href="#the-2nd-implementation-equivalent-to-the-1st-one-but-more-compact" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scheduler</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">poses</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="n">infos</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># scheduler.optimize(input=(edges, poses), weight=infos)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 38 minutes  33.176 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.344 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-pgo-pgo-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/59654aaebbbf41a63c6f7bdfcf863c9d/pgo_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pgo_tutorial.py</span></code></a></p>
@@ -402,7 +401,18 @@ Saving to ../dataset/pgo/save/parking-garage.g2o_10.png
 
   
 
-    <hr>
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
 
   
 
@@ -427,20 +437,16 @@ Saving to ../dataset/pgo/save/parking-garage.g2o_10.png
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-                <li>
-                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
-                </li>
-              <ul>
-
-              <ul>
 <li><a class="reference internal" href="#">Pose Graph Optimization Tutorial</a><ul>
-<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#define-pose-graph">Define Pose Graph</a></li>
+<li><a class="reference internal" href="#define-optimizer">Define Optimizer</a></li>
 <li><a class="reference internal" href="#the-1st-implementation-for-customization-and-easy-to-extend">the 1st implementation: for customization and easy to extend</a></li>
 <li><a class="reference internal" href="#the-2nd-implementation-equivalent-to-the-1st-one-but-more-compact">The 2nd implementation: equivalent to the 1st one, but more compact</a></li>
 </ul>
 </li>
 </ul>
 
+              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
             </div>
           </div>
         </div>
@@ -572,7 +578,7 @@ Saving to ../dataset/pgo/save/parking-garage.g2o_10.png
             <a href="https://pypose.org/docs/main/index.html">Docs</a>
           </li>
           <li>
-            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
           <li>
             <a href="https://github.com/pypose/pypose">Github</a>

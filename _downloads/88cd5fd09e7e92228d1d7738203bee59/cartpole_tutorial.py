@@ -71,6 +71,7 @@ N = 1000    # Number of time steps
 
 time  = torch.arange(0, N+1) * dt
 input = torch.sin(time)
+
 ######################################################################
 # Initial state
 
@@ -100,6 +101,7 @@ thetadot_fig = createTimePlot(time, thetadot, figname="theta dot Plot", xlabel="
 
 ######################################################################
 # Jacobian computation - Find jacobians at the last step
+
 jacob_state, jacob_input = state_all[-1,:].T, input[-1]
 cartPoleSolver.set_refpoint(state=jacob_state, input=jacob_input.unsqueeze(0), t=time[-1])
 A = cartPoleSolver.A

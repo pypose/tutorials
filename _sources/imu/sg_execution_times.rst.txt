@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**00:09.761** total execution time for **imu** files:
+**00:14.508** total execution time for **imu** files:
 
 +---------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_imu_imu_corrector_tutorial.py` (``imu_corrector_tutorial.py``)   | 00:09.761 | 0.0 MB |
+| :ref:`sphx_glr_imu_imu_corrector_tutorial.py` (``imu_corrector_tutorial.py``)   | 00:09.585 | 0.0 MB |
 +---------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_imu_imu_dataset.py` (``imu_dataset.py``)                         | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_imu_imu_integrator_tutorial.py` (``imu_integrator_tutorial.py``) | 00:04.921 | 0.0 MB |
 +---------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_imu_imu_integrator_tutorial.py` (``imu_integrator_tutorial.py``) | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_imu_imu_dataset_tutorial.py` (``imu_dataset_tutorial.py``)       | 00:00.002 | 0.0 MB |
 +---------------------------------------------------------------------------------+-----------+--------+

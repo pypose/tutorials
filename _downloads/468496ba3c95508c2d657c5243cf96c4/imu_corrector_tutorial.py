@@ -10,12 +10,12 @@ from torch import nn
 import tqdm, argparse
 import torch.utils.data as Data
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from imu_dataset import KITTI_IMU, imu_collate, move_to
+from imu_dataset_tutorial import KITTI_IMU, imu_collate, move_to
 
 
 ######################################################################
-# Preparation
-# ------------
+# Define IMU Corrector
+# -----------------------
 
 class IMUCorrector(nn.Module):
     def __init__(self, size_list= [6, 64, 128, 128, 128, 6]):
@@ -114,7 +114,7 @@ train_loader = Data.DataLoader(dataset=train_dataset, batch_size=args.batch_size
 test_loader = Data.DataLoader(dataset=test_dataset, batch_size=args.batch_size, collate_fn=imu_collate, shuffle=False)
 
 ######################################################################
-# optimizer
+# Optimizer
 
 network = IMUCorrector().to(args.device)
 optimizer = torch.optim.Adam(network.parameters(), lr = 5e-6)  # to use with ViTs

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Cartpole Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  <title>Cartpole Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -76,10 +76,10 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pypose.org/">Get Started</a>
+            <a href="https://pypose.org/get-started">Get Started</a>
           </li>
 
-          <!-- <li> -->
+          <!-- <li class="active"> -->
           <li>
             <a href="https://pypose.org/tutorials">Tutorials</a>
           </li>
@@ -90,7 +90,7 @@
           </li>
 
           <li>
-            <a href="https://pypose.org/">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
 
           <li>
@@ -124,6 +124,10 @@
             
               
               
+                <div class="version">
+                  0.1.5
+                </div>
+              
             
 
             
@@ -134,7 +138,7 @@
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -161,6 +165,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
 </ul>
@@ -201,7 +206,7 @@
       <li>
         <a href="../index.html">
           
-            Docs
+            Tutorials
           
         </a> &gt;
       </li>
@@ -231,6 +236,28 @@
 
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">dynamics/cartpole_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
 
         
           
@@ -343,7 +370,7 @@ to download the full example code</p>
 <li><img src="../_images/sphx_glr_cartpole_tutorial_004.png" srcset="../_images/sphx_glr_cartpole_tutorial_004.png" alt="theta dot Plot" class = "sphx-glr-multi-img"/></li>
 </ul>
 <p>Jacobian computation - Find jacobians at the last step</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jacob_state</span><span class="p">,</span> <span class="n">jacob_input</span> <span class="o">=</span> <span class="n">state_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">mT</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jacob_state</span><span class="p">,</span> <span class="n">jacob_input</span> <span class="o">=</span> <span class="n">state_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">jacob_state</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">jacob_input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">A</span>
 <span class="n">B</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">B</span>
@@ -355,13 +382,11 @@ to download the full example code</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/home/tianhao/twu3/tutorials/dynamics_source/cartpole_tutorial.py&quot;</span>, line <span class="m">103</span>, in <span class="n">&lt;module&gt;</span>
-    <span class="n">jacob_state</span><span class="p">,</span> <span class="n">jacob_input</span> <span class="o">=</span> <span class="n">state_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">mT</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<span class="gr">RuntimeError</span>: <span class="n">tensor.mT is only supported on matrices or batches of matrices. Got 1-D tensor.</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/tianhao/twu3/tutorials/dynamics_source/cartpole_tutorial.py:105: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matricesor `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2981.)
+  jacob_state, jacob_input = state_all[-1,:].T, input[-1]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.202 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.150 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-dynamics-cartpole-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/88cd5fd09e7e92228d1d7738203bee59/cartpole_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">cartpole_tutorial.py</span></code></a></p>
@@ -392,7 +417,18 @@ to download the full example code</p>
 
   
 
-    <hr>
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
 
   
 
@@ -417,12 +453,6 @@ to download the full example code</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-                <li>
-                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
-                </li>
-              <ul>
-
-              <ul>
 <li><a class="reference internal" href="#">Cartpole Tutorial</a><ul>
 <li><a class="reference internal" href="#preparation">Preparation</a></li>
 <li><a class="reference internal" href="#create-parameters-for-cart-pole-trajectory">Create parameters for cart pole trajectory</a></li>
@@ -430,6 +460,7 @@ to download the full example code</p>
 </li>
 </ul>
 
+              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
             </div>
           </div>
         </div>
@@ -561,7 +592,7 @@ to download the full example code</p>
             <a href="https://pypose.org/docs/main/index.html">Docs</a>
           </li>
           <li>
-            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
           <li>
             <a href="https://github.com/pypose/pypose">Github</a>

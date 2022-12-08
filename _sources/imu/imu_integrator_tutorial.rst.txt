@@ -37,7 +37,7 @@ IMU Integrator Tutorial
     import matplotlib.pyplot as plt
     from matplotlib.patches import Ellipse
     from matplotlib.collections import PatchCollection
-    from imu_dataset import KITTI_IMU, imu_collate, move_to
+    from imu_dataset_tutorial import KITTI_IMU, imu_collate, move_to
 
 
 
@@ -267,7 +267,7 @@ Define Parameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.224 seconds)
+   **Total running time of the script:** ( 0 minutes  4.921 seconds)
 
 
 .. _sphx_glr_download_imu_imu_integrator_tutorial.py:

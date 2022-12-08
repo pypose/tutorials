@@ -51,10 +51,10 @@ Note: change `DATAROOT` to the folder you select.
 
 .. only:: html
 
-  .. image:: /pgo/images/thumb/sphx_glr_pgo_dataset_thumb.png
+  .. image:: /pgo/images/thumb/sphx_glr_pgo_dataset_tutorial_thumb.png
     :alt: Pose Graph Optimization Dataset Tutorial
 
-  :ref:`sphx_glr_pgo_pgo_dataset.py`
+  :ref:`sphx_glr_pgo_pgo_dataset_tutorial.py`
 
 .. raw:: html
 
@@ -87,7 +87,7 @@ Note: change `DATAROOT` to the folder you select.
 .. toctree::
    :hidden:
 
-   /pgo/pgo_dataset
+   /pgo/pgo_dataset_tutorial
    /pgo/pgo_tutorial
 
 

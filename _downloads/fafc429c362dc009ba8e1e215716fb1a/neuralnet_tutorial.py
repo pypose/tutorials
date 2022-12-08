@@ -39,11 +39,13 @@ def createTimePlot(x, y, figname="Un-named plot", title=None, xlabel=None, ylabe
 
 ######################################################################
 # Time Step
+
 dt = 0.01  # Time step size
 N  = 1000  # Number of time steps
 
 ######################################################################
 # Time and input
+
 time  = torch.arange(0, N + 1) * dt
 input = torch.sin(time)
 

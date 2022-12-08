@@ -10,7 +10,7 @@ import torch
 import argparse
 import pypose as pp
 from torch import nn
-from pgo_dataset import G2OPGO
+from pgo_dataset_tutorial import G2OPGO
 import matplotlib.pyplot as plt
 import pypose.optim.solver as ppos
 import pypose.optim.kernel as ppok
@@ -20,8 +20,9 @@ from pypose.optim.scheduler import StopOnPlateau
 
 
 ######################################################################
-# Preparation
-# ------------
+# Define Pose Graph
+# ------------------
+
 class PoseGraph(nn.Module):
 
     def __init__(self, nodes):
@@ -66,6 +67,10 @@ os.makedirs(os.path.join(args.save), exist_ok=True)
 data = G2OPGO(args.dataroot, args.dataname, device=args.device)
 edges, poses, infos = data.edges, data.poses, data.infos
 
+######################################################################
+# Define Optimizer
+# -------------------------------------------------------------
+
 graph = PoseGraph(data.nodes).to(args.device)
 solver = ppos.Cholesky()
 strategy = ppost.TrustRegion(radius=args.radius)
@@ -78,17 +83,19 @@ axlim = plot_and_save(graph.nodes.translation(), pngname, args.dataname)
 ######################################################################
 # the 1st implementation: for customization and easy to extend
 # -------------------------------------------------------------
+# commented out because too time consumming
 
-while scheduler.continual:
-    loss = optimizer.step(input=(edges, poses), weight=infos)
-    scheduler.step(loss)
+# while scheduler.continual:
+#     loss = optimizer.step(input=(edges, poses), weight=infos)
+#     scheduler.step(loss)
 
-    name = os.path.join(args.save, args.dataname + '_' + str(scheduler.steps))
-    title = 'PyPose PGO at the %d step(s) with loss %7f'%(scheduler.steps, loss.item())
-    plot_and_save(graph.nodes.translation(), name+'.png', title, axlim=axlim)
-    torch.save(graph.state_dict(), name+'.pt')
+#     name = os.path.join(args.save, args.dataname + '_' + str(scheduler.steps))
+#     title = 'PyPose PGO at the %d step(s) with loss %7f'%(scheduler.steps, loss.item())
+#     plot_and_save(graph.nodes.translation(), name+'.png', title, axlim=axlim)
+#     torch.save(graph.state_dict(), name+'.pt')
 
 ######################################################################
 # The 2nd implementation: equivalent to the 1st one, but more compact
 # --------------------------------------------------------------------
-scheduler.optimize(input=(edges, poses), weight=infos)
+
+# scheduler.optimize(input=(edges, poses), weight=infos)

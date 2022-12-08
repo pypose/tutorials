@@ -111,10 +111,10 @@ Note: change `DATAROOT` to the folder you select.
 
 .. only:: html
 
-  .. image:: /imu/images/thumb/sphx_glr_imu_dataset_thumb.png
+  .. image:: /imu/images/thumb/sphx_glr_imu_dataset_tutorial_thumb.png
     :alt: IMU Dataset Tutorial
 
-  :ref:`sphx_glr_imu_imu_dataset.py`
+  :ref:`sphx_glr_imu_imu_dataset_tutorial.py`
 
 .. raw:: html
 
@@ -148,7 +148,7 @@ Note: change `DATAROOT` to the folder you select.
    :hidden:
 
    /imu/imu_integrator_tutorial
-   /imu/imu_dataset
+   /imu/imu_dataset_tutorial
    /imu/imu_corrector_tutorial
 
 

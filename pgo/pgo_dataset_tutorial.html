@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pose Graph Optimization Dataset Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  <title>Pose Graph Optimization Dataset Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -74,10 +74,10 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pypose.org/">Get Started</a>
+            <a href="https://pypose.org/get-started">Get Started</a>
           </li>
 
-          <!-- <li> -->
+          <!-- <li class="active"> -->
           <li>
             <a href="https://pypose.org/tutorials">Tutorials</a>
           </li>
@@ -88,7 +88,7 @@
           </li>
 
           <li>
-            <a href="https://pypose.org/">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
 
           <li>
@@ -122,6 +122,10 @@
             
               
               
+                <div class="version">
+                  0.1.5
+                </div>
+              
             
 
             
@@ -132,7 +136,7 @@
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -159,6 +163,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
 </ul>
@@ -199,7 +204,7 @@
       <li>
         <a href="../index.html">
           
-            Docs
+            Tutorials
           
         </a> &gt;
       </li>
@@ -211,7 +216,7 @@
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/pgo/pgo_dataset.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/pgo/pgo_dataset_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -231,6 +236,28 @@
         <div class="pytorch-content-left">
 
         
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">pgo/pgo_dataset_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
           
           <div class="rst-content">
           
@@ -239,11 +266,11 @@
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-pgo-pgo-dataset-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-pgo-pgo-dataset-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="pose-graph-optimization-dataset-tutorial">
-<span id="sphx-glr-pgo-pgo-dataset-py"></span><h1>Pose Graph Optimization Dataset Tutorial<a class="headerlink" href="#pose-graph-optimization-dataset-tutorial" title="Permalink to this heading">¶</a></h1>
+<span id="sphx-glr-pgo-pgo-dataset-tutorial-py"></span><h1>Pose Graph Optimization Dataset Tutorial<a class="headerlink" href="#pose-graph-optimization-dataset-tutorial" title="Permalink to this heading">¶</a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span><span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
@@ -294,13 +321,13 @@ to download the full example code</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-pgo-pgo-dataset-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.001 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-pgo-pgo-dataset-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/608021d428a2614b5a415504403fc0f2/pgo_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pgo_dataset.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/36bacb52f296899ccbba4b050e241d02/pgo_dataset_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pgo_dataset_tutorial.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/ff8efeed27d52e38aba2038ce301381d/pgo_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">pgo_dataset.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/4dd897cd8852b4bd79222bb97beed49e/pgo_dataset_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">pgo_dataset_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -315,7 +342,18 @@ to download the full example code</p>
 
   
 
-    <hr>
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
 
   
 
@@ -340,15 +378,10 @@ to download the full example code</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-                <li>
-                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
-                </li>
-              <ul>
-
-              <ul>
 <li><a class="reference internal" href="#">Pose Graph Optimization Dataset Tutorial</a></li>
 </ul>
 
+              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
             </div>
           </div>
         </div>
@@ -480,7 +513,7 @@ to download the full example code</p>
             <a href="https://pypose.org/docs/main/index.html">Docs</a>
           </li>
           <li>
-            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
           <li>
             <a href="https://github.com/pypose/pypose">Github</a>

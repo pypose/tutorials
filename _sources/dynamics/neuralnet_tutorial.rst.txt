@@ -83,9 +83,10 @@ Preparation
 
 Time Step
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 42-46
 
 .. code-block:: default
+
 
     dt = 0.01  # Time step size
     N  = 1000  # Number of time steps
@@ -97,13 +98,14 @@ Time Step
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-47
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 Time and input
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-50
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: default
+
 
     time  = torch.arange(0, N + 1) * dt
     input = torch.sin(time)
@@ -115,11 +117,11 @@ Time and input
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-52
+.. GENERATED FROM PYTHON SOURCE LINES 53-54
 
 Initial state
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-55
+.. GENERATED FROM PYTHON SOURCE LINES 54-57
 
 .. code-block:: default
 
@@ -133,11 +135,11 @@ Initial state
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-57
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Create solver object
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-60
+.. GENERATED FROM PYTHON SOURCE LINES 59-62
 
 .. code-block:: default
 
@@ -151,11 +153,11 @@ Create solver object
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 Calculate trajectory
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-69
+.. GENERATED FROM PYTHON SOURCE LINES 64-71
 
 .. code-block:: default
 
@@ -173,11 +175,11 @@ Calculate trajectory
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
+.. GENERATED FROM PYTHON SOURCE LINES 72-73
 
 Create plots
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-78
+.. GENERATED FROM PYTHON SOURCE LINES 73-80
 
 .. code-block:: default
 
@@ -215,7 +217,7 @@ Create plots
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.482 seconds)
+   **Total running time of the script:** ( 0 minutes  0.123 seconds)
 
 
 .. _sphx_glr_download_dynamics_neuralnet_tutorial.py:

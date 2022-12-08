@@ -48,12 +48,12 @@ def createTimePlot(x, y, figname="Un-named plot", title=None, xlabel=None, ylabe
 ######################################################################
 # Number of time steps
 # ---------------------
+
 N = 100    
 
 
 ######################################################################
 # Time, Input, Initial state
-
 
 time  = torch.arange(0, N+1)
 input = torch.sin(2*math.pi*time/50)
@@ -78,6 +78,7 @@ for i in range(N):
 
 ######################################################################
 # Create time plots to show dynamics
+
 f, ax = plt.subplots(nrows=4, sharex=True)
 for _i in range(2):
     ax[_i].plot(time, state_all[:,_i], label='pp')
@@ -90,12 +91,14 @@ ax[-1].legend()
 
 ######################################################################
 # Jacobian computation - Find jacobians at the last step
+
 vars = ['A', 'B', 'C', 'D', 'c1', 'c2']
 solver.set_refpoint()
 [print(_v, getattr(solver, _v)) for _v in vars]
 
 ######################################################################
 # Jacobian computation - Find jacobians at the 5th step
+
 idx = 5
 solver.set_refpoint(state=state_all[idx], input=input[idx], t=time[idx])
 [print(_v, getattr(solver, _v)) for _v in vars]

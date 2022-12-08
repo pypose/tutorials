@@ -15,7 +15,7 @@ import torch.utils.data as Data
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from matplotlib.collections import PatchCollection
-from imu_dataset import KITTI_IMU, imu_collate, move_to
+from imu_dataset_tutorial import KITTI_IMU, imu_collate, move_to
 
 
 ######################################################################

@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LieTensor Tutorial &mdash; PyPose Tutorials 0.1.5 documentation</title>
+  <title>LieTensor Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -76,10 +76,10 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://pypose.org/">Get Started</a>
+            <a href="https://pypose.org/get-started">Get Started</a>
           </li>
 
-          <!-- <li> -->
+          <!-- <li class="active"> -->
           <li>
             <a href="https://pypose.org/tutorials">Tutorials</a>
           </li>
@@ -90,7 +90,7 @@
           </li>
 
           <li>
-            <a href="https://pypose.org/">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
 
           <li>
@@ -124,6 +124,10 @@
             
               
               
+                <div class="version">
+                  0.1.5
+                </div>
+              
             
 
             
@@ -134,7 +138,7 @@
 
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="text" name="q" placeholder="Search Tutorials" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -161,6 +165,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
 </ul>
@@ -201,7 +206,7 @@
       <li>
         <a href="../index.html">
           
-            Docs
+            Tutorials
           
         </a> &gt;
       </li>
@@ -233,6 +238,28 @@
         <div class="pytorch-content-left">
 
         
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">beginner/lietensor_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
           
           <div class="rst-content">
           
@@ -246,60 +273,122 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="lietensor-tutorial">
 <span id="sphx-glr-beginner-lietensor-tutorial-py"></span><h1>LieTensor Tutorial<a class="headerlink" href="#lietensor-tutorial" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> is the cornerstone of PyPose project. <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> is derived from
+<code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code>. it represents Lie Algebra or Lie Group. It support all
+the <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code> features and also specific features for Lie Theory.</p>
+<p>We will see eventually in this tutorial that, with <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>,
+one could easily implement operations often used in robotics applications.</p>
+<p>In PyPose, we would want to utilize the powerful network training API the comes with PyTorch.
+So, we will go a step further to see how we can use <code class="docutils literal notranslate"><span class="pre">LieTensor`</span></code> in training a simple network.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
 </pre></div>
 </div>
 <section id="intialization">
 <h2>1. Intialization<a class="headerlink" href="#intialization" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">so3</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">identity_SE3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<p>The first thing we need to know is how to initialize a LieTensor.
+Use <code class="docutils literal notranslate"><span class="pre">pypose.LieTensor</span></code> or alias like <code class="docutils literal notranslate"><span class="pre">pypose.so3</span></code>, specify the <code class="docutils literal notranslate"><span class="pre">data</span></code> and <code class="docutils literal notranslate"><span class="pre">ltpye</span></code>.
+See list of <code class="docutils literal notranslate"><span class="pre">ltype</span></code>
+<a class="reference external" href="https://pypose.org/docs/main/generated/pypose.LieTensor/#pypose.LieTensor">here</a>.</p>
+<p>Note that the last dimension
+of <code class="docutils literal notranslate"><span class="pre">data</span></code> has to align with the <code class="docutils literal notranslate"><span class="pre">LieTensor.ltype.dimension</span></code>
+because LieTensor has different length with respect to different <code class="docutils literal notranslate"><span class="pre">ltype</span></code>.
+Here we have a <code class="docutils literal notranslate"><span class="pre">(2,3)</span></code> shaped tensor, because <code class="docutils literal notranslate"><span class="pre">so3_type</span></code>
+requires a dimension of 3 for each element.</p>
+<p>It is recommanded to use alias to initialize LieTensor.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda:0&#39;</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">LieTensor</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ltype</span><span class="o">=</span><span class="n">pp</span><span class="o">.</span><span class="n">so3_type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a:&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">so3</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;b:&#39;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>a: so3Type LieTensor:
+LieTensor([[ 0.4567,  0.3911,  0.3407],
+           [-1.2741,  0.0698,  0.2887]], device=&#39;cuda:0&#39;,
+          grad_fn=&lt;AliasBackward0&gt;)
+b: so3Type LieTensor:
+LieTensor([[ 0.4567,  0.3911,  0.3407],
+           [-1.2741,  0.0698,  0.2887]], device=&#39;cuda:0&#39;,
+          grad_fn=&lt;AliasBackward0&gt;)
+</pre></div>
+</div>
+<p>Like <code class="docutils literal notranslate"><span class="pre">PyTorch</span></code>, you can initialize an identity <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> or a random <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>.
+Use the function related to each <code class="docutils literal notranslate"><span class="pre">ltype</span></code>. For example, here we used <code class="docutils literal notranslate"><span class="pre">pypose.identity_SE3</span></code>
+and <code class="docutils literal notranslate"><span class="pre">pypose.randn_se3</span></code>. The usage is similar with <cite>torch.randn</cite>, except the shape we input
+is <code class="docutils literal notranslate"><span class="pre">lshape</span></code>.
+The only difference between <code class="docutils literal notranslate"><span class="pre">LieTensor.lshape</span></code> and <code class="docutils literal notranslate"><span class="pre">tensor.shape</span></code> is the last dimension is hidden, since
+<code class="docutils literal notranslate"><span class="pre">lshape</span></code> takes the last dimension as a single <code class="docutils literal notranslate"><span class="pre">ltype</span></code> item.</p>
+<p>You might notice the case difference here.
+In PyPose, uppercase refers to Lie Group, and lowercase refers to Lie Algebra.
+Often, we use Lie Group to represent transformation.
+But, when used in optimization or backpropagated, Lie Algebra is needed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor.lview</span></code> here is used to change the shape of a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>,
+similar to <code class="docutils literal notranslate"><span class="pre">torch.view</span></code>.
+The difference is that <code class="docutils literal notranslate"><span class="pre">LieTensor.lview</span></code> does not modify the last dimension.
+It is intuitive since we need each element in <code class="docutils literal notranslate"><span class="pre">x</span></code> stays a <code class="docutils literal notranslate"><span class="pre">SE3</span></code> ltype.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">identity_SE3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_se3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a:&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">x.shape:&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">x.gshape:&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">lshape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;x.shape:&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">x.gshape:&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">lshape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">lview</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>a: so3Type LieTensor:
-LieTensor([[-2.2638, -0.4771,  1.5078],
-           [ 0.3542, -0.3725, -1.3291]])
-x.shape: torch.Size([2, 1, 7])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>x.shape: torch.Size([2, 1, 7])
 x.gshape: torch.Size([2, 1])
 SE3Type LieTensor:
 LieTensor([[0., 0., 0., 0., 0., 0., 1.],
            [0., 0., 0., 0., 0., 0., 1.]])
 se3Type LieTensor:
-LieTensor([[[ 0.5694,  1.6048,  0.1480,  0.6726, -0.5059, -0.9744],
-            [ 0.2694,  0.3830,  0.2743,  1.0604,  0.3516, -0.1946]],
+LieTensor([[[ 0.0156,  0.7401, -0.0734,  0.6730,  1.4288, -0.6651],
+            [ 0.2939, -0.4897,  1.5925,  0.0798,  1.7409,  0.7414]],
 
-           [[-2.1244,  0.7299, -2.5000,  0.6875, -0.7015, -0.2474],
-            [-1.1213, -0.7150,  1.6552, -1.8409,  0.7483, -0.2629]]])
+           [[-0.6374, -1.4526,  2.8286,  0.3862, -0.8733, -1.0379],
+            [-0.5551,  2.7687, -0.3630, -1.1918,  0.6340,  1.3801]]])
 </pre></div>
 </div>
+</section>
 <section id="all-arguments-in-pytorch-are-supported">
-<h3>All arguments in PyTorch are supported<a class="headerlink" href="#all-arguments-in-pytorch-are-supported" title="Permalink to this heading">¶</a></h3>
+<h2>2. All arguments in PyTorch are supported<a class="headerlink" href="#all-arguments-in-pytorch-are-supported" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> is derived from <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code>, so it inherit all the
+attributes of a <code class="docutils literal notranslate"><span class="pre">tensor</span></code>.
+You could specify <code class="docutils literal notranslate"><span class="pre">device</span></code>, <code class="docutils literal notranslate"><span class="pre">dtype</span></code>, and <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> during the initialization,
+just like PyTorch.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_SO3</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">identity_like</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(SO3Type LieTensor:
+LieTensor([[-0.3905,  0.8618,  0.2238,  0.2341],
+           [-0.1923,  0.3152,  0.6905,  0.6220],
+           [ 0.2245,  0.2831,  0.1133,  0.9255]], device=&#39;cuda:0&#39;,
+          dtype=torch.float64, requires_grad=True), SO3Type LieTensor:
+LieTensor([[0., 0., 0., 1.],
+           [0., 0., 0., 1.],
+           [0., 0., 0., 1.]]))
+</pre></div>
+</div>
+<p>And also, easy data type transform.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 <span class="n">a</span><span class="p">,</span> <span class="n">t</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(SO3Type LieTensor:
-LieTensor([[ 0.2429,  0.2401,  0.2155,  0.9148],
-           [-0.5643,  0.1867,  0.5538,  0.5831],
-           [-0.3532, -0.7846,  0.2573,  0.4399]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.3905,  0.8618,  0.2238,  0.2341],
+           [-0.1923,  0.3152,  0.6905,  0.6220],
+           [ 0.2245,  0.2831,  0.1133,  0.9255]], device=&#39;cuda:0&#39;,
           dtype=torch.float64, requires_grad=True), SO3Type LieTensor:
-LieTensor([[ 0.2429,  0.2401,  0.2155,  0.9148],
-           [-0.5643,  0.1867,  0.5538,  0.5831],
-           [-0.3532, -0.7846,  0.2573,  0.4399]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.3905,  0.8618,  0.2238,  0.2341],
+           [-0.1923,  0.3152,  0.6905,  0.6220],
+           [ 0.2245,  0.2831,  0.1133,  0.9255]], device=&#39;cuda:0&#39;,
           grad_fn=&lt;AliasBackward0&gt;))
 </pre></div>
 </div>
 </section>
-</section>
 <section id="slicing-and-shaping">
-<h2>2. Slicing and Shaping<a class="headerlink" href="#slicing-and-shaping" title="Permalink to this heading">¶</a></h2>
+<h2>Slicing and Shaping<a class="headerlink" href="#slicing-and-shaping" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> concatination is also the same as <code class="docutils literal notranslate"><span class="pre">Pytorch</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_SO3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">B</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_SO3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>         <span class="c1"># Tensor cat</span>
@@ -323,22 +412,37 @@ F: torch.Size([2, 2])
 </pre></div>
 </div>
 </section>
-<section id="basic-operations">
-<h2>3. Basic Operations<a class="headerlink" href="#basic-operations" title="Permalink to this heading">¶</a></h2>
+<section id="exponential-logarithm-and-inversion-function">
+<h2>3. Exponential, Logarithm and Inversion Function<a class="headerlink" href="#exponential-logarithm-and-inversion-function" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor.Exp</span></code> is the Exponential function defined in Lie Theory,
+which transform a input Lie Algebra to Lie Group.
+<code class="docutils literal notranslate"><span class="pre">LieTensor.Log</span></code> is the Logarithm function, whcih transform Lie Group back to Lie Algebra.
+See the doc of
+<a class="reference external" href="https://pypose.org/docs/main/generated/pypose.Exp/">LieTensor.Exp</a> and
+<a class="reference external" href="https://pypose.org/docs/main/generated/pypose.Log/">LieTensor.Log</a>
+for the math.</p>
+<p><code class="docutils literal notranslate"><span class="pre">LieTensor.Inv</span></code> gives us the inversion of a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>.
+Assume you have a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> of <code class="docutils literal notranslate"><span class="pre">pypose.so3_type</span></code>
+representing a rotation <span class="math notranslate nohighlight">\(R\)</span>, the <cite>Inv</cite> will give you <span class="math notranslate nohighlight">\(R^{-1}\)</span>.
+See <a class="reference external" href="https://pypose.org/docs/main/generated/pypose.Inv/">LieTensor.Inv</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="o">.</span><span class="n">Exp</span><span class="p">())</span><span class="o">.</span><span class="n">Inv</span><span class="p">()</span><span class="o">.</span><span class="n">Log</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>se3Type LieTensor:
-LieTensor([[[-0.5694, -1.6048, -0.1480, -0.6726,  0.5059,  0.9744],
-            [-0.2694, -0.3830, -0.2743, -1.0604, -0.3516,  0.1946]],
+LieTensor([[[-0.0156, -0.7401,  0.0734, -0.6730, -1.4288,  0.6651],
+            [-0.2939,  0.4897, -1.5925, -0.0798, -1.7409, -0.7414]],
 
-           [[ 2.1244, -0.7299,  2.5000, -0.6875,  0.7015,  0.2474],
-            [ 1.1213,  0.7150, -1.6552,  1.8409, -0.7483,  0.2629]]])
+           [[ 0.6374,  1.4526, -2.8286, -0.3862,  0.8733,  1.0379],
+            [ 0.5551, -2.7687,  0.3630,  1.1918, -0.6340, -1.3801]]])
 </pre></div>
 </div>
 </section>
 <section id="adjoint-transforms">
 <h2>4. Adjoint Transforms<a class="headerlink" href="#adjoint-transforms" title="Permalink to this heading">¶</a></h2>
+<p>We also have adjoint operations. Assume <code class="docutils literal notranslate"><span class="pre">X</span></code> is a Lie Group,
+and <code class="docutils literal notranslate"><span class="pre">a</span></code> is a small left increment in Lie Algebra.
+Adjoint operation will input <code class="docutils literal notranslate"><span class="pre">a</span></code> and output a right increment <code class="docutils literal notranslate"><span class="pre">b</span></code> that gives ther same transformation.
+See <a class="reference external" href="https://pypose.org/docs/main/generated/pypose.Adj/">pypose.Adj</a> for more details.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_Sim3</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_sim3</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">AdjT</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -357,28 +461,40 @@ tensor(False)
 </section>
 <section id="grdients">
 <h2>5. Grdients<a class="headerlink" href="#grdients" title="Permalink to this heading">¶</a></h2>
+<p>As mentioned at the beginning, we would want to utilize the powerful
+network training API the comes with PyTorch.
+We might want to start by calculating gradients,
+which is a core step of any network training.
+First, we need to initialize the <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> of which we want to get gradients.
+Remember to set <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_so3</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">is_leaf</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">Exp</span><span class="p">()</span><span class="o">.</span><span class="n">Log</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="c1"># Just test, No physical meaning</span>
+</pre></div>
+</div>
+<p>And, just like in PyTorch, we will define a <code class="docutils literal notranslate"><span class="pre">loss</span></code>, and call <code class="docutils literal notranslate"><span class="pre">loss.backward</span></code>.
+That’s it. Exactly the same with PyTorch.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">Exp</span><span class="p">()</span><span class="o">.</span><span class="n">Log</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="c1"># Just test, No physical meaning</span>
 <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
 <span class="n">loss</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor(0.1205, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;), tensor([[-0.0977, -0.0482, -0.1812],
-        [ 0.1555, -0.3701, -0.1870],
-        [-0.1725,  0.2448, -0.3887]], device=&#39;cuda:0&#39;), so3Type LieTensor:
-LieTensor([[-0.0488, -0.0241, -0.0906],
-           [ 0.0777, -0.1852, -0.0935],
-           [-0.0862,  0.1224, -0.1945]], device=&#39;cuda:0&#39;, requires_grad=True), so3Type LieTensor:
-LieTensor([[-0.0488, -0.0241, -0.0906],
-           [ 0.0777, -0.1852, -0.0935],
-           [-0.0862,  0.1224, -0.1945]], device=&#39;cuda:0&#39;))
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor(0.0662, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;), tensor([[-0.0729, -0.1988, -0.3481],
+        [ 0.0309, -0.0624,  0.0327],
+        [ 0.0555,  0.1522, -0.2576]], device=&#39;cuda:0&#39;), so3Type LieTensor:
+LieTensor([[-0.0364, -0.0994, -0.1741],
+           [ 0.0154, -0.0312,  0.0163],
+           [ 0.0278,  0.0761, -0.1288]], device=&#39;cuda:0&#39;, requires_grad=True), so3Type LieTensor:
+LieTensor([[-0.0364, -0.0994, -0.1741],
+           [ 0.0154, -0.0312,  0.0163],
+           [ 0.0278,  0.0761, -0.1288]], device=&#39;cuda:0&#39;))
 </pre></div>
 </div>
 </section>
 <section id="test-a-module">
 <h2>6. Test a Module<a class="headerlink" href="#test-a-module" title="Permalink to this heading">¶</a></h2>
+<p>Now that we know all the basic operations, we might start ahead to build our first network.
+First of all, we define our <code class="docutils literal notranslate"><span class="pre">TestNet</span></code> as follows. Still, it doesn’t have any physical meaning.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 
 <span class="k">def</span> <span class="nf">count_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
@@ -391,9 +507,15 @@ LieTensor([[-0.0488, -0.0241, -0.0906],
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">Exp</span><span class="p">()</span> <span class="o">*</span> <span class="n">x</span>
-
-
-<span class="n">n</span><span class="p">,</span><span class="n">epoch</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<p>Still, like PyTorch, we instantiate our network, optimizer, and scheduler.
+Scheduler here is to control the learning rate, see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.MultiStepLR.html#torch.optim.lr_scheduler.MultiStepLR">lr_scheduler.MultiStepLR</a>
+for more detail.</p>
+<p>Then, inside the loop, we run our training. If you are not familiar with the training process,
+we would recommand you reading one of the PyTorch tutorial, like
+<a class="reference external" href="https://pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">this</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n</span><span class="p">,</span><span class="n">epoch</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">TestNet</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
@@ -417,26 +539,30 @@ LieTensor([[-0.0488, -0.0241, -0.0906],
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Before Optimization:
  so3Type Parameter:
 Parameter containing:
-Parameter(Parameter([[ 0.9853,  0.7453,  0.5795],
-           [ 1.0430, -0.9287,  0.6975],
-           [-0.0814,  0.8786,  0.7938],
-           [ 2.4384,  1.2223, -1.2418]], device=&#39;cuda:0&#39;, requires_grad=True))
-tensor(7.1409, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.8957, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.7648, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.3195, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(7.0756, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+Parameter(Parameter([[-0.7575, -1.1578,  0.7875],
+           [ 1.5490, -1.2544, -0.2541],
+           [-0.5892, -1.3568, -0.7859],
+           [-0.8750,  0.8052,  2.7513]], device=&#39;cuda:0&#39;, requires_grad=True))
+tensor(6.6353, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.5730, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.6481, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.3317, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.3482, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
 Parameter: 12
 After Optimization:
  so3Type Parameter:
 Parameter containing:
-Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
-           [ 0.3458,  0.1767,  0.1380],
-           [ 0.0524,  0.1763,  0.6429],
-           [ 2.2414,  0.5162, -1.1565]], device=&#39;cuda:0&#39;, requires_grad=True))
+Parameter(Parameter([[-0.7923,  0.0798,  0.1084],
+           [ 0.9822, -0.7881,  0.2221],
+           [-0.1222, -0.4126,  0.2770],
+           [ 0.0762,  0.2292,  1.6084]], device=&#39;cuda:0&#39;, requires_grad=True))
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.786 seconds)</p>
+<p>And then we are finished with our <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> tutorial.
+Hopefully you are more familiar with it by now.</p>
+<p>Now you may be free to explore other tutorials.
+See How PyPose can be utilized in real robotics applications.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.236 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-lietensor-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b01f90f90e79163ca99d3a635e8f24f5/lietensor_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">lietensor_tutorial.py</span></code></a></p>
@@ -467,7 +593,18 @@ Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
 
   
 
-    <hr>
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
 
   
 
@@ -492,19 +629,11 @@ Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-                <li>
-                  <a href="https://twitter.com/pypose_org">Find us in Twitter!</a>   
-                </li>
-              <ul>
-
-              <ul>
 <li><a class="reference internal" href="#">LieTensor Tutorial</a><ul>
-<li><a class="reference internal" href="#intialization">1. Intialization</a><ul>
-<li><a class="reference internal" href="#all-arguments-in-pytorch-are-supported">All arguments in PyTorch are supported</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#slicing-and-shaping">2. Slicing and Shaping</a></li>
-<li><a class="reference internal" href="#basic-operations">3. Basic Operations</a></li>
+<li><a class="reference internal" href="#intialization">1. Intialization</a></li>
+<li><a class="reference internal" href="#all-arguments-in-pytorch-are-supported">2. All arguments in PyTorch are supported</a></li>
+<li><a class="reference internal" href="#slicing-and-shaping">Slicing and Shaping</a></li>
+<li><a class="reference internal" href="#exponential-logarithm-and-inversion-function">3. Exponential, Logarithm and Inversion Function</a></li>
 <li><a class="reference internal" href="#adjoint-transforms">4. Adjoint Transforms</a></li>
 <li><a class="reference internal" href="#grdients">5. Grdients</a></li>
 <li><a class="reference internal" href="#test-a-module">6. Test a Module</a></li>
@@ -512,6 +641,7 @@ Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
 </li>
 </ul>
 
+              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
             </div>
           </div>
         </div>
@@ -530,6 +660,7 @@ Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
+         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
      
 
   
@@ -643,7 +774,7 @@ Parameter(Parameter([[ 0.2744,  0.1266,  0.0272],
             <a href="https://pypose.org/docs/main/index.html">Docs</a>
           </li>
           <li>
-            <a href="https://pypose.org/docs/main/index.html">About Us</a>
+            <a href="https://pypose.org/about-us">About Us</a>
           </li>
           <li>
             <a href="https://github.com/pypose/pypose">Github</a>

@@ -125,7 +125,7 @@ Create parameters for cart pole trajectory
 
 Time and input
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-74
+.. GENERATED FROM PYTHON SOURCE LINES 71-75
 
 .. code-block:: default
 
@@ -139,11 +139,12 @@ Time and input
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-76
+
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 Initial state
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-79
+.. GENERATED FROM PYTHON SOURCE LINES 77-80
 
 .. code-block:: default
 
@@ -157,11 +158,11 @@ Initial state
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 81-82
 
 Create dynamics solver object
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-83
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 .. code-block:: default
 
@@ -174,11 +175,11 @@ Create dynamics solver object
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 85-86
 
 Calculate trajectory
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-92
+.. GENERATED FROM PYTHON SOURCE LINES 86-93
 
 .. code-block:: default
 
@@ -196,11 +197,11 @@ Calculate trajectory
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Create time plots to show dynamics
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-101
+.. GENERATED FROM PYTHON SOURCE LINES 95-102
 
 .. code-block:: default
 
@@ -249,15 +250,16 @@ Create time plots to show dynamics
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-103
+.. GENERATED FROM PYTHON SOURCE LINES 103-104
 
 Jacobian computation - Find jacobians at the last step
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-113
+.. GENERATED FROM PYTHON SOURCE LINES 104-115
 
 .. code-block:: default
 
-    jacob_state, jacob_input = state_all[-1,:].mT, input[-1]
+
+    jacob_state, jacob_input = state_all[-1,:].T, input[-1]
     cartPoleSolver.set_refpoint(state=jacob_state, input=jacob_input.unsqueeze(0), t=time[-1])
     A = cartPoleSolver.A
     B = cartPoleSolver.B
@@ -269,14 +271,14 @@ Jacobian computation - Find jacobians at the last step
     plt.show()
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/tianhao/twu3/tutorials/dynamics_source/cartpole_tutorial.py", line 103, in <module>
-        jacob_state, jacob_input = state_all[-1,:].mT, input[-1]
-    RuntimeError: tensor.mT is only supported on matrices or batches of matrices. Got 1-D tensor.
+    /home/tianhao/twu3/tutorials/dynamics_source/cartpole_tutorial.py:105: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matricesor `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2981.)
+      jacob_state, jacob_input = state_all[-1,:].T, input[-1]
 
 
 
@@ -284,7 +286,7 @@ Jacobian computation - Find jacobians at the last step
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.202 seconds)
+   **Total running time of the script:** ( 0 minutes  0.150 seconds)
 
 
 .. _sphx_glr_download_dynamics_cartpole_tutorial.py:
