@@ -96,7 +96,6 @@ a, t
 
 ######################################################################
 # Slicing and Shaping
-# ---------------------------------------
 # ``LieTensor`` concatination is also the same as ``Pytorch``.
 
 A = pp.randn_SO3(2,2)

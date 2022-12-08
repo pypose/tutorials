@@ -5,8 +5,8 @@
 
 Computation times
 =================
-**00:01.236** total execution time for **beginner** files:
+**00:01.072** total execution time for **beginner** files:
 
 +----------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_beginner_lietensor_tutorial.py` (``lietensor_tutorial.py``) | 00:01.236 | 0.0 MB |
+| :ref:`sphx_glr_beginner_lietensor_tutorial.py` (``lietensor_tutorial.py``) | 00:01.072 | 0.0 MB |
 +----------------------------------------------------------------------------+-----------+--------+
