@@ -1,4 +1,4 @@
-This is my gallery
+Beginner Tutorial
 ==================
 
-Below is a gallery of examples
+This is a gallery of beginner's tutorial for pypose.

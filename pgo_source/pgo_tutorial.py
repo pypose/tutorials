@@ -83,18 +83,19 @@ axlim = plot_and_save(graph.nodes.translation(), pngname, args.dataname)
 ######################################################################
 # the 1st implementation: for customization and easy to extend
 # -------------------------------------------------------------
+# commented out because too time consumming
 
-while scheduler.continual:
-    loss = optimizer.step(input=(edges, poses), weight=infos)
-    scheduler.step(loss)
+# while scheduler.continual:
+#     loss = optimizer.step(input=(edges, poses), weight=infos)
+#     scheduler.step(loss)
 
-    name = os.path.join(args.save, args.dataname + '_' + str(scheduler.steps))
-    title = 'PyPose PGO at the %d step(s) with loss %7f'%(scheduler.steps, loss.item())
-    plot_and_save(graph.nodes.translation(), name+'.png', title, axlim=axlim)
-    torch.save(graph.state_dict(), name+'.pt')
+#     name = os.path.join(args.save, args.dataname + '_' + str(scheduler.steps))
+#     title = 'PyPose PGO at the %d step(s) with loss %7f'%(scheduler.steps, loss.item())
+#     plot_and_save(graph.nodes.translation(), name+'.png', title, axlim=axlim)
+#     torch.save(graph.state_dict(), name+'.pt')
 
 ######################################################################
 # The 2nd implementation: equivalent to the 1st one, but more compact
 # --------------------------------------------------------------------
 
-scheduler.optimize(input=(edges, poses), weight=infos)
+# scheduler.optimize(input=(edges, poses), weight=infos)
