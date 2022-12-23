@@ -24,8 +24,8 @@ Welcome to Pypose Tutorials
    :maxdepth: 2
    :caption: IMU
 
-   imu/imu_corrector_tutorial
    imu/imu_integrator_tutorial
+   imu/imu_corrector_tutorial
 
 .. toctree::
    :maxdepth: 2
