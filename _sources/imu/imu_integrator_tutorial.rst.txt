@@ -54,7 +54,7 @@ An IMU typically consists of:
   * Accelerometers: providing a measure of acceleration
 
 With acceleration and angular velocity, we can get velocity and position using basic kinetics:
-  * The firt integral of acceleration over time is the change in velocity.
+  * The first integral of acceleration over time is the change in velocity.
   * The second integral of acceleration over time is the change in position. 
 
 This process is called the IMU preintegration, often used in applications in robotics 
@@ -374,7 +374,7 @@ See the help message for the usage of each parameter.
                         action='store_true',
                         help="plot in 3D space, default: False")
     parser.set_defaults(plot3d=False)
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
     print(args)
     os.makedirs(os.path.join(args.save), exist_ok=True)
     torch.set_default_tensor_type(torch.DoubleTensor)
@@ -605,7 +605,7 @@ In the IMUCorrector tutorial, we will see an example of how we can correct this.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.324 seconds)
+   **Total running time of the script:** ( 0 minutes  3.770 seconds)
 
 
 .. _sphx_glr_download_imu_imu_integrator_tutorial.py:

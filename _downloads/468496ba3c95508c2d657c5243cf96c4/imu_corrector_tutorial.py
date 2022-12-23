@@ -11,7 +11,6 @@ IMU Corrector Tutorial
 # !pip install pypose
 # !pip install pykitti
 
-# TODO: The loss is not reducing, is this correct?
 ######################################################################
 # In this tutorial, we will be implementing a simple IMUCorrector
 # using ``torch.nn`` modules and ``pypose.IMUPreintegrator``.
@@ -376,10 +375,10 @@ parser.add_argument("--datadrive",
 parser.add_argument('--load_ckpt', 
                     default=False, 
                     action="store_true")
-args = parser.parse_args(); print(args)
+args, unknown = parser.parse_known_args(); print(args)
 
 ######################################################################
-# 8. Deine Dataloaders
+# 8. Define Dataloaders
 # -------------------------
 # 
 

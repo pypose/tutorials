@@ -22,7 +22,7 @@ IMU Integrator Tutorial
 #   * Accelerometers: providing a measure of acceleration
 #
 # With acceleration and angular velocity, we can get velocity and position using basic kinetics:
-#   * The firt integral of acceleration over time is the change in velocity.
+#   * The first integral of acceleration over time is the change in velocity.
 #   * The second integral of acceleration over time is the change in position. 
 #
 # This process is called the IMU preintegration, often used in applications in robotics 
@@ -271,7 +271,7 @@ parser.add_argument('--plot3d',
                     action='store_true',
                     help="plot in 3D space, default: False")
 parser.set_defaults(plot3d=False)
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 print(args)
 os.makedirs(os.path.join(args.save), exist_ok=True)
 torch.set_default_tensor_type(torch.DoubleTensor)
