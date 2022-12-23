@@ -90,23 +90,6 @@ Note: change `DATAROOT` to the folder you select.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="IMU Integrator Tutorial">
-
-.. only:: html
-
-  .. image:: /imu/images/thumb/sphx_glr_imu_integrator_tutorial_thumb.png
-    :alt: IMU Integrator Tutorial
-
-  :ref:`sphx_glr_imu_imu_integrator_tutorial.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">IMU Integrator Tutorial</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="IMU Dataset Tutorial">
 
 .. only:: html
@@ -119,6 +102,23 @@ Note: change `DATAROOT` to the folder you select.
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">IMU Dataset Tutorial</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="IMU Integrator Tutorial">
+
+.. only:: html
+
+  .. image:: /imu/images/thumb/sphx_glr_imu_integrator_tutorial_thumb.png
+    :alt: IMU Integrator Tutorial
+
+  :ref:`sphx_glr_imu_imu_integrator_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">IMU Integrator Tutorial</div>
     </div>
 
 
@@ -147,8 +147,8 @@ Note: change `DATAROOT` to the folder you select.
 .. toctree::
    :hidden:
 
-   /imu/imu_integrator_tutorial
    /imu/imu_dataset_tutorial
+   /imu/imu_integrator_tutorial
    /imu/imu_corrector_tutorial
 
 

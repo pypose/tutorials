@@ -165,7 +165,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">IMU Integrator Tutorial</a></li>
 </ul>
@@ -273,9 +272,41 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="imu-integrator-tutorial">
 <span id="sphx-glr-imu-imu-integrator-tutorial-py"></span><h1>IMU Integrator Tutorial<a class="headerlink" href="#imu-integrator-tutorial" title="Permalink to this heading">¶</a></h1>
+<p>Uncomment this if you’re using google colab to run this script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install pypose</span>
+<span class="c1"># !pip install pykitti</span>
+</pre></div>
+</div>
+<p>In this tutorial, we will be doing IMU integration using the <code class="docutils literal notranslate"><span class="pre">pypose.module.IMUPreintegrator</span></code> module.</p>
+<section id="what-is-imu-integration">
+<h2>1. What is IMU integration<a class="headerlink" href="#what-is-imu-integration" title="Permalink to this heading">¶</a></h2>
+<p>An Inertial Measurement Unit (IMU) is a device that can measure accelaration and angular velocity.</p>
+<dl class="simple">
+<dt>An IMU typically consists of:</dt><dd><ul class="simple">
+<li><p>Gyroscopes: providing a measure of angular velocity</p></li>
+<li><p>Accelerometers: providing a measure of acceleration</p></li>
+</ul>
+</dd>
+<dt>With acceleration and angular velocity, we can get velocity and position using basic kinetics:</dt><dd><ul class="simple">
+<li><p>The firt integral of acceleration over time is the change in velocity.</p></li>
+<li><p>The second integral of acceleration over time is the change in position.</p></li>
+</ul>
+</dd>
+</dl>
+<p>This process is called the IMU preintegration, often used in applications in robotics
+like SLAM (Simultaneous Localization and Mapping).</p>
+<section id="uncertainty">
+<h3>Uncertainty<a class="headerlink" href="#uncertainty" title="Permalink to this heading">¶</a></h3>
+<p>However, IMU measurements contains very big noise. For example, if we put an IMU sensor in a static position,
+the measurements will jump around zero. That’s why, the more we integrate, the more uncertain we are.
+This uncertainty can also be measured mathematically. Please refer the
+<a class="reference external" href="https://pypose.org/docs/main/generated/pypose.module.IMUPreintegrator/">doc</a> for the math.</p>
+<p>We will see below in a simple example, how we can get the IMU integrated position and the uncertainty
+with <code class="docutils literal notranslate"><span class="pre">pypose.module.IMUPreintegrator</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pykitti</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -283,11 +314,159 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
 <span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">PatchCollection</span>
-<span class="kn">from</span> <span class="nn">imu_dataset_tutorial</span> <span class="kn">import</span> <span class="n">KITTI_IMU</span><span class="p">,</span> <span class="n">imu_collate</span><span class="p">,</span> <span class="n">move_to</span>
 </pre></div>
 </div>
-<section id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+<section id="dataset-defination">
+<h2>2. Dataset Defination<a class="headerlink" href="#dataset-defination" title="Permalink to this heading">¶</a></h2>
+<p>First we will define the <code class="docutils literal notranslate"><span class="pre">KITTI_IMU</span></code> dataset as a <code class="docutils literal notranslate"><span class="pre">data.Dataset</span></code> in torch, for easy usage.
+We’re using the <code class="docutils literal notranslate"><span class="pre">pykitti</span></code> package.
+This package provides a minimal set of tools for working with the KITTI datasets.
+To access a data sequence, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">pykitti</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">drive</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some of the data attributes we used below are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset.timestamps</span></code>:    Timestamps are parsed into a list of datetime objects</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset.oxts</span></code>:          List of OXTS packets and 6-dof poses as named tuples</p></li>
+</ul>
+<p>For more details about the data format, please refer to their github page
+<a class="reference external" href="https://github.com/utiasSTARS/pykitti#references">here</a>.</p>
+<p>A sequence will be seperated into many segments. The number of segments is controlled by <code class="docutils literal notranslate"><span class="pre">step_size</span></code>.
+Each segment of the sequence will return the measurements like <code class="docutils literal notranslate"><span class="pre">dt</span></code>, <code class="docutils literal notranslate"><span class="pre">acc</span></code>, and <code class="docutils literal notranslate"><span class="pre">gyro</span></code>
+for a few frames, defined by duration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">KITTI_IMU</span><span class="p">(</span><span class="n">Data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pykitti</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">dataname</span><span class="p">,</span> <span class="n">drive</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;evaluate&#39;</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;test&#39;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> mode is not supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">datetime</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span>
+                               <span class="n">datetime</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gyro</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">wx</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">wy</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">wz</span><span class="p">]</span>
+                                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">ay</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">az</span><span class="p">]</span>
+                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gt_rot</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">euler2SO3</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">roll</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">yaw</span><span class="p">]</span>
+                                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gt_vel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_rot</span> <span class="o">@</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">vf</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">vl</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">packet</span><span class="o">.</span><span class="n">vu</span><span class="p">]</span>
+                                                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gt_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">oxts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T_w_imu</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span><span class="p">)]))</span>
+
+        <span class="n">start_frame</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">end_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+            <span class="n">end_frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
+            <span class="n">start_frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq_len</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_map</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">end_frame</span> <span class="o">-</span> <span class="n">start_frame</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index_map</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">end_frame_id</span> <span class="o">=</span> <span class="n">frame_id</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="n">frame_id</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="p">],</span>
+            <span class="s1">&#39;acc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">acc</span><span class="p">[</span><span class="n">frame_id</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="p">],</span>
+            <span class="s1">&#39;gyro&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gyro</span><span class="p">[</span><span class="n">frame_id</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="p">],</span>
+            <span class="s1">&#39;gyro&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gyro</span><span class="p">[</span><span class="n">frame_id</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="p">],</span>
+            <span class="s1">&#39;gt_pos&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_pos</span><span class="p">[</span><span class="n">frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;gt_rot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_rot</span><span class="p">[</span><span class="n">frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;gt_vel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_vel</span><span class="p">[</span><span class="n">frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;init_pos&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_pos</span><span class="p">[</span><span class="n">frame_id</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+            <span class="c1"># TODO: the init rotation might be used in gravity compensation</span>
+            <span class="s1">&#39;init_rot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_rot</span><span class="p">[</span><span class="n">frame_id</span><span class="p">:</span> <span class="n">end_frame_id</span><span class="p">],</span>
+            <span class="s1">&#39;init_vel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_vel</span><span class="p">[</span><span class="n">frame_id</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">get_init_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_pos</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;rot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_rot</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;vel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gt_vel</span><span class="p">[:</span><span class="mi">1</span><span class="p">]}</span>
+</pre></div>
+</div>
+</section>
+<section id="utility-functions">
+<h2>3. Utility Functions<a class="headerlink" href="#utility-functions" title="Permalink to this heading">¶</a></h2>
+<p>These are several utility functions. You can skip to the parameter definations
+and come back when necessary.</p>
+<section id="imu-collate">
+<h3><code class="docutils literal notranslate"><span class="pre">imu_collate</span></code><a class="headerlink" href="#imu-collate" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">imu_collate</span></code> is used in batch operation, to stack data in multiple frames together.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">imu_collate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">acc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="n">gyro</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gyro&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+
+    <span class="n">gt_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt_pos&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="n">gt_rot</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt_rot&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="n">gt_vel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt_vel&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+
+    <span class="n">init_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_pos&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="n">init_rot</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_rot&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="n">init_vel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_vel&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+        <span class="s1">&#39;acc&#39;</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span>
+        <span class="s1">&#39;gyro&#39;</span><span class="p">:</span> <span class="n">gyro</span><span class="p">,</span>
+
+        <span class="s1">&#39;gt_pos&#39;</span><span class="p">:</span> <span class="n">gt_pos</span><span class="p">,</span>
+        <span class="s1">&#39;gt_vel&#39;</span><span class="p">:</span> <span class="n">gt_vel</span><span class="p">,</span>
+        <span class="s1">&#39;gt_rot&#39;</span><span class="p">:</span> <span class="n">gt_rot</span><span class="p">,</span>
+
+        <span class="s1">&#39;init_pos&#39;</span><span class="p">:</span> <span class="n">init_pos</span><span class="p">,</span>
+        <span class="s1">&#39;init_vel&#39;</span><span class="p">:</span> <span class="n">init_vel</span><span class="p">,</span>
+        <span class="s1">&#39;init_rot&#39;</span><span class="p">:</span> <span class="n">init_rot</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="move-to">
+<h3><code class="docutils literal notranslate"><span class="pre">move_to</span></code><a class="headerlink" href="#move-to" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">move_to</span></code> used to move different object to CUDA device.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">move_to</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">move_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">move_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">device</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">res</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid type for move_to&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="plot-gaussian">
+<h3><code class="docutils literal notranslate"><span class="pre">plot_gaussian</span></code><a class="headerlink" href="#plot-gaussian" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">plot_gaussian</span></code> used to plot an ellipse measuring uncertainty,
+bigger ellipse means bigger uncertainty.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_gaussian</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">covs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Set specific color to show edges, otherwise same with facecolor.&#39;&#39;&#39;</span>
     <span class="n">ellipses</span> <span class="o">=</span> <span class="p">[]</span>
@@ -300,53 +479,131 @@ to download the full example code</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">PatchCollection</span><span class="p">(</span><span class="n">ellipses</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Define Parameters</p>
+</section>
+</section>
+<section id="define-parameters">
+<h2>4. Define Parameters<a class="headerlink" href="#define-parameters" title="Permalink to this heading">¶</a></h2>
+<p>Here we define all the parameters we will use.
+See the help message for the usage of each parameter.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;IMU Preintegration&#39;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--device&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;cuda or cpu&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--integrating-step&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;number of integrated steps&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--batch-size&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;batch size, only support 1 now&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--step-size&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the size of the integration for one interval&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--save&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/save/&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;location of png files to save&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataroot&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset location downloaded&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataname&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2011_09_26&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset name&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--datadrive&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0001&quot;</span><span class="p">,</span><span class="s2">&quot;0002&quot;</span><span class="p">,</span><span class="s2">&quot;0005&quot;</span><span class="p">,</span><span class="s2">&quot;0009&quot;</span><span class="p">,</span><span class="s2">&quot;0011&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;0013&quot;</span><span class="p">,</span><span class="s2">&quot;0014&quot;</span><span class="p">,</span><span class="s2">&quot;0015&quot;</span><span class="p">,</span><span class="s2">&quot;0017&quot;</span><span class="p">,</span><span class="s2">&quot;0018&quot;</span><span class="p">,</span><span class="s2">&quot;0019&quot;</span><span class="p">,</span><span class="s2">&quot;0020&quot;</span><span class="p">,</span><span class="s2">&quot;0022&quot;</span><span class="p">,</span><span class="s2">&quot;0005&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;data sequences&quot;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--plot3d&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;plot3d&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;plot in 3D space, default: False&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--device&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;cuda or cpu&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--batch-size&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;batch size, only support 1 now&quot;</span><span class="p">)</span> <span class="c1">#why?</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--step-size&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the size of the integration for one interval&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--save&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/save/&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;location of png files to save&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataroot&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="s1">&#39;../dataset/&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset location downloaded&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--dataname&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2011_09_26&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dataset name&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--datadrive&quot;</span><span class="p">,</span>
+                    <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;0001&quot;</span><span class="p">,</span> <span class="s2">&quot;0002&quot;</span><span class="p">,</span> <span class="s2">&quot;0005&quot;</span><span class="p">,</span> <span class="s2">&quot;0009&quot;</span><span class="p">,</span> <span class="s2">&quot;0011&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;0013&quot;</span><span class="p">,</span> <span class="s2">&quot;0014&quot;</span><span class="p">,</span> <span class="s2">&quot;0015&quot;</span><span class="p">,</span> <span class="s2">&quot;0017&quot;</span><span class="p">,</span> <span class="s2">&quot;0018&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;0019&quot;</span><span class="p">,</span> <span class="s2">&quot;0020&quot;</span><span class="p">,</span> <span class="s2">&quot;0022&quot;</span><span class="p">],</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;data sequences&quot;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--plot3d&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;plot3d&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;plot in 3D space, default: False&quot;</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">plot3d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">();</span> <span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">set_default_tensor_type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">DoubleTensor</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Namespace(device=&#39;cpu&#39;, batch_size=1, step_size=2, save=&#39;../dataset/save/&#39;, dataroot=&#39;../dataset/&#39;, dataname=&#39;2011_09_26&#39;, datadrive=[&#39;0001&#39;, &#39;0002&#39;, &#39;0005&#39;, &#39;0009&#39;, &#39;0011&#39;, &#39;0013&#39;, &#39;0014&#39;, &#39;0015&#39;, &#39;0017&#39;, &#39;0018&#39;, &#39;0019&#39;, &#39;0020&#39;, &#39;0022&#39;], plot3d=False)
+</pre></div>
+</div>
+</section>
+<section id="perform-integration">
+<h2>5. Perform Integration<a class="headerlink" href="#perform-integration" title="Permalink to this heading">¶</a></h2>
+<p>With everything set up, we will perform the core operation of IMU integration.
+There are mainly 5 steps in the codes below:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p><strong>Step 1</strong>: Define dataloader using the <code class="docutils literal notranslate"><span class="pre">KITTI_IMU</span></code> class we defined above</p></li>
+<li><p><strong>Step 2</strong>: Get the initial position, rotation and velocity, all 0 here</p></li>
+<li><p><strong>Step 3</strong>: Define the IMUPreintegrator</p></li>
+<li><dl>
+<dt><strong>Step 4</strong>: Perform integration:</dt><dd><p>After running the forward function of the <code class="docutils literal notranslate"><span class="pre">integrator</span></code>, the result is stored in <code class="docutils literal notranslate"><span class="pre">state</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">state['pos']</span></code> is the integrated position, and <code class="docutils literal notranslate"><span class="pre">state['cov']</span></code> is the uncertainty measurements.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">state['cov']</span></code> is a 9x9 matrix in the order of rotation, velocity, and position.
+That’s why in visualization we are using <code class="docutils literal notranslate"><span class="pre">covs[:,</span> <span class="pre">6:8,</span> <span class="pre">6:8]</span></code> here: they are the covariance matrix of <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> position.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>Step 5</strong>: Visualization</p></li>
+</ol>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">datadrive</span><span class="p">:</span>
 
-<span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">datadrive</span><span class="p">:</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">KITTI_IMU</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dataroot</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;evaluate&#39;</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">imu_collate</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># Step 1: Define dataloader using the ``KITTI_IMU`` class we defined above</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">KITTI_IMU</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dataroot</span><span class="p">,</span>
+                        <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="p">,</span>
+                        <span class="n">drive</span><span class="p">,</span>
+                        <span class="n">duration</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
+                        <span class="n">step_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
+                        <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;evaluate&#39;</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                             <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                             <span class="n">collate_fn</span><span class="o">=</span><span class="n">imu_collate</span><span class="p">,</span>
+                             <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: Get the initial position, rotation and velocity, all 0 here</span>
     <span class="n">init</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_init_value</span><span class="p">()</span>
-    <span class="n">integrator</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">IMUPreintegrator</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span> <span class="n">init</span><span class="p">[</span><span class="s1">&#39;rot&#39;</span><span class="p">],</span> <span class="n">init</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
+    <span class="c1"># Step 3: Define the IMUPreintegrator.</span>
+    <span class="n">integrator</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">IMUPreintegrator</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span>
+                                            <span class="n">init</span><span class="p">[</span><span class="s1">&#39;rot&#39;</span><span class="p">],</span>
+                                            <span class="n">init</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span>
+                                            <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="c1"># Step 4: Perform integration</span>
     <span class="n">poses</span><span class="p">,</span> <span class="n">poses_gt</span> <span class="o">=</span> <span class="p">[</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]]</span>
     <span class="n">covs</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
+
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">move_to</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="n">state</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">gyro</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gyro&#39;</span><span class="p">],</span> <span class="n">acc</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">],</span> <span class="n">rot</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;init_rot&#39;</span><span class="p">])</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span>
+                           <span class="n">gyro</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gyro&#39;</span><span class="p">],</span>
+                           <span class="n">acc</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">],</span>
+                           <span class="n">rot</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;init_rot&#39;</span><span class="p">])</span>
         <span class="n">poses_gt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;gt_pos&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
         <span class="n">poses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
         <span class="n">covs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;cov&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
 
     <span class="n">poses</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">poses</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">poses_gt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="n">covs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">covs</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">covs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">covs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
+    <span class="c1"># Step 5: Visualization</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot3d</span><span class="p">:</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot3D</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">plot_gaussian</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">covs</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">poses_gt</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">poses_gt</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">plot_gaussian</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">poses</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">covs</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PyPose IMU Integrator&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;PyPose&quot;</span><span class="p">,</span> <span class="s2">&quot;Ground Truth&quot;</span><span class="p">])</span>
     <span class="n">figure</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">dataname</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">drive</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
@@ -368,10 +625,8 @@ to download the full example code</p>
 <li><img src="../_images/sphx_glr_imu_integrator_tutorial_011.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_011.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_imu_integrator_tutorial_012.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_012.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_imu_integrator_tutorial_013.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_013.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_imu_integrator_tutorial_014.png" srcset="../_images/sphx_glr_imu_integrator_tutorial_014.png" alt="PyPose IMU Integrator" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Namespace(device=&#39;cpu&#39;, integrating_step=1, batch_size=1, step_size=2, save=&#39;../dataset/save/&#39;, dataroot=&#39;../dataset/&#39;, dataname=&#39;2011_09_26&#39;, datadrive=[&#39;0001&#39;, &#39;0002&#39;, &#39;0005&#39;, &#39;0009&#39;, &#39;0011&#39;, &#39;0013&#39;, &#39;0014&#39;, &#39;0015&#39;, &#39;0017&#39;, &#39;0018&#39;, &#39;0019&#39;, &#39;0020&#39;, &#39;0022&#39;, &#39;0005&#39;], plot3d=False)
-Saved to ../dataset/save/2011_09_26_0001.png
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Saved to ../dataset/save/2011_09_26_0001.png
 Saved to ../dataset/save/2011_09_26_0002.png
 Saved to ../dataset/save/2011_09_26_0005.png
 Saved to ../dataset/save/2011_09_26_0009.png
@@ -384,10 +639,13 @@ Saved to ../dataset/save/2011_09_26_0018.png
 Saved to ../dataset/save/2011_09_26_0019.png
 Saved to ../dataset/save/2011_09_26_0020.png
 Saved to ../dataset/save/2011_09_26_0022.png
-Saved to ../dataset/save/2011_09_26_0005.png
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.921 seconds)</p>
+<p>We can see that, in some of the sequences,
+the integrated position drifts away from the groundtruth, also the uncertainty grows very big.
+This shows the noisy nature of the IMU sensor.
+In the IMUCorrector tutorial, we will see an example of how we can correct this.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.324 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-imu-imu-integrator-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7757467eff38094f3de15b5f207bda6e/imu_integrator_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">imu_integrator_tutorial.py</span></code></a></p>
@@ -455,7 +713,19 @@ Saved to ../dataset/save/2011_09_26_0005.png
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">IMU Integrator Tutorial</a><ul>
-<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#what-is-imu-integration">1. What is IMU integration</a><ul>
+<li><a class="reference internal" href="#uncertainty">Uncertainty</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dataset-defination">2. Dataset Defination</a></li>
+<li><a class="reference internal" href="#utility-functions">3. Utility Functions</a><ul>
+<li><a class="reference internal" href="#imu-collate"><code class="docutils literal notranslate"><span class="pre">imu_collate</span></code></a></li>
+<li><a class="reference internal" href="#move-to"><code class="docutils literal notranslate"><span class="pre">move_to</span></code></a></li>
+<li><a class="reference internal" href="#plot-gaussian"><code class="docutils literal notranslate"><span class="pre">plot_gaussian</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#define-parameters">4. Define Parameters</a></li>
+<li><a class="reference internal" href="#perform-integration">5. Perform Integration</a></li>
 </ul>
 </li>
 </ul>

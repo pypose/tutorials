@@ -5,6 +5,13 @@ LieTensor Tutorial
 """
 
 ######################################################################
+# Uncomment this if you're using google colab to run this script
+#
+
+# !pip install pypose 
+
+
+######################################################################
 # ``LieTensor`` is the cornerstone of PyPose project. ``LieTensor`` is derived from
 # ``torch.tensor``. it represents Lie Algebra or Lie Group. It support all 
 # the ``torch.tensor`` features and also specific features for Lie Theory.
@@ -14,7 +21,7 @@ LieTensor Tutorial
 # one could easily implement operations often used in robotics applications.
 #
 # In PyPose, we would want to utilize the powerful network training API the comes with PyTorch.
-# So, we will go a step further to see how we can use ``LieTensor``` in training a simple network.
+# So, we will go a step further to see how we can use ``LieTensor`` in training a simple network.
 #
 
 import torch
@@ -47,7 +54,7 @@ print('b:', b)
 ######################################################################
 # Like ``PyTorch``, you can initialize an identity ``LieTensor`` or a random ``LieTensor``.
 # Use the function related to each ``ltype``. For example, here we used ``pypose.identity_SE3``
-# and ``pypose.randn_se3``. The usage is similar with `torch.randn`, except the shape we input
+# and ``pypose.randn_se3``. The usage is similar with ``torch.randn``, except the shape we input
 # is ``lshape``.
 # The only difference between ``LieTensor.lshape`` and ``tensor.shape`` is the last dimension is hidden, since
 # ``lshape`` takes the last dimension as a single ``ltype`` item.
@@ -57,8 +64,7 @@ print('b:', b)
 ######################################################################
 # You might notice the case difference here. 
 # In PyPose, uppercase refers to Lie Group, and lowercase refers to Lie Algebra.
-# Often, we use Lie Group to represent transformation. 
-# But, when used in optimization or backpropagated, Lie Algebra is needed.
+# It is recommanded to use Lie Group, unless Lie Algebra is absolutely necessary.
 # 
 
 ######################################################################
@@ -125,7 +131,7 @@ print('F:', F.lshape)
 #
 # ``LieTensor.Inv`` gives us the inversion of a ``LieTensor``.
 # Assume you have a ``LieTensor`` of ``pypose.so3_type``
-# representing a rotation :math:`R`, the `Inv` will give you :math:`R^{-1}`.
+# representing a rotation :math:`{\rm R}`, the `Inv` will give you :math:`{\rm R^{-1}}`.
 # See `LieTensor.Inv <https://pypose.org/docs/main/generated/pypose.Inv/>`_.
 # 
 
@@ -201,7 +207,7 @@ class TestNet(nn.Module):
 
 
 ######################################################################
-# Still, like PyTorch, we instantiate our network, optimizer, and scheduler.
+# Like PyTorch, we instantiate our network, optimizer, and scheduler.
 # Scheduler here is to control the learning rate, see `lr_scheduler.MultiStepLR
 # <https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.MultiStepLR.html#torch.optim.lr_scheduler.MultiStepLR>`_
 # for more detail.

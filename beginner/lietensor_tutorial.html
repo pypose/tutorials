@@ -165,7 +165,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../imu/imu_dataset_tutorial.html">IMU Dataset Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
 </ul>
@@ -273,13 +272,17 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="lietensor-tutorial">
 <span id="sphx-glr-beginner-lietensor-tutorial-py"></span><h1>LieTensor Tutorial<a class="headerlink" href="#lietensor-tutorial" title="Permalink to this heading">¶</a></h1>
+<p>Uncomment this if you’re using google colab to run this script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install pypose</span>
+</pre></div>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> is the cornerstone of PyPose project. <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> is derived from
 <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code>. it represents Lie Algebra or Lie Group. It support all
 the <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code> features and also specific features for Lie Theory.</p>
 <p>We will see eventually in this tutorial that, with <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>,
 one could easily implement operations often used in robotics applications.</p>
 <p>In PyPose, we would want to utilize the powerful network training API the comes with PyTorch.
-So, we will go a step further to see how we can use <code class="docutils literal notranslate"><span class="pre">LieTensor`</span></code> in training a simple network.</p>
+So, we will go a step further to see how we can use <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> in training a simple network.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
 </pre></div>
@@ -304,25 +307,24 @@ requires a dimension of 3 for each element.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>a: so3Type LieTensor:
-LieTensor([[ 0.7744,  0.7854, -1.7636],
-           [ 0.4158,  1.1766, -0.5151]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.4728,  1.1572,  1.7338],
+           [-0.5382, -0.3093, -1.2587]], device=&#39;cuda:0&#39;,
           grad_fn=&lt;AliasBackward0&gt;)
 b: so3Type LieTensor:
-LieTensor([[ 0.7744,  0.7854, -1.7636],
-           [ 0.4158,  1.1766, -0.5151]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.4728,  1.1572,  1.7338],
+           [-0.5382, -0.3093, -1.2587]], device=&#39;cuda:0&#39;,
           grad_fn=&lt;AliasBackward0&gt;)
 </pre></div>
 </div>
 <p>Like <code class="docutils literal notranslate"><span class="pre">PyTorch</span></code>, you can initialize an identity <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> or a random <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>.
 Use the function related to each <code class="docutils literal notranslate"><span class="pre">ltype</span></code>. For example, here we used <code class="docutils literal notranslate"><span class="pre">pypose.identity_SE3</span></code>
-and <code class="docutils literal notranslate"><span class="pre">pypose.randn_se3</span></code>. The usage is similar with <cite>torch.randn</cite>, except the shape we input
+and <code class="docutils literal notranslate"><span class="pre">pypose.randn_se3</span></code>. The usage is similar with <code class="docutils literal notranslate"><span class="pre">torch.randn</span></code>, except the shape we input
 is <code class="docutils literal notranslate"><span class="pre">lshape</span></code>.
 The only difference between <code class="docutils literal notranslate"><span class="pre">LieTensor.lshape</span></code> and <code class="docutils literal notranslate"><span class="pre">tensor.shape</span></code> is the last dimension is hidden, since
 <code class="docutils literal notranslate"><span class="pre">lshape</span></code> takes the last dimension as a single <code class="docutils literal notranslate"><span class="pre">ltype</span></code> item.</p>
 <p>You might notice the case difference here.
 In PyPose, uppercase refers to Lie Group, and lowercase refers to Lie Algebra.
-Often, we use Lie Group to represent transformation.
-But, when used in optimization or backpropagated, Lie Algebra is needed.</p>
+It is recommanded to use Lie Group, unless Lie Algebra is absolutely necessary.</p>
 <p><code class="docutils literal notranslate"><span class="pre">LieTensor.lview</span></code> here is used to change the shape of a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>,
 similar to <code class="docutils literal notranslate"><span class="pre">torch.view</span></code>.
 The difference is that <code class="docutils literal notranslate"><span class="pre">LieTensor.lview</span></code> does not modify the last dimension.
@@ -340,11 +342,11 @@ SE3Type LieTensor:
 LieTensor([[0., 0., 0., 0., 0., 0., 1.],
            [0., 0., 0., 0., 0., 0., 1.]])
 se3Type LieTensor:
-LieTensor([[[-1.5375,  0.9997, -0.8386,  0.0100, -0.5473, -1.0149],
-            [-1.2607,  0.3279,  2.2532, -0.4546,  0.3020,  0.2535]],
+LieTensor([[[-2.6034, -0.1131, -0.7638, -0.5181, -0.5008,  0.4294],
+            [-0.8536, -0.7519, -0.4739,  0.7229,  2.2891,  0.2145]],
 
-           [[-0.7564, -0.0112,  0.9919, -0.8431, -1.2986, -0.4500],
-            [-0.2493,  1.6187, -0.4859, -1.7117,  0.2403,  2.2933]]])
+           [[-0.0689,  0.9770, -0.1680,  0.3129, -0.1002, -1.4849],
+            [-2.0900, -0.3519,  1.4629,  1.0783, -0.3289,  0.1629]]])
 </pre></div>
 </div>
 </section>
@@ -360,9 +362,9 @@ just like PyTorch.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(SO3Type LieTensor:
-LieTensor([[ 0.2051, -0.2154,  0.4171,  0.8588],
-           [ 0.6135, -0.6312,  0.2647,  0.3939],
-           [ 0.1477, -0.2664,  0.9004,  0.3106]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.6752, -0.2354, -0.5144,  0.4733],
+           [ 0.0401, -0.1291, -0.2195,  0.9662],
+           [ 0.1854,  0.9778,  0.0467,  0.0856]], device=&#39;cuda:0&#39;,
           dtype=torch.float64, requires_grad=True), SO3Type LieTensor:
 LieTensor([[0., 0., 0., 1.],
            [0., 0., 0., 1.],
@@ -375,13 +377,13 @@ LieTensor([[0., 0., 0., 1.],
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(SO3Type LieTensor:
-LieTensor([[ 0.2051, -0.2154,  0.4171,  0.8588],
-           [ 0.6135, -0.6312,  0.2647,  0.3939],
-           [ 0.1477, -0.2664,  0.9004,  0.3106]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.6752, -0.2354, -0.5144,  0.4733],
+           [ 0.0401, -0.1291, -0.2195,  0.9662],
+           [ 0.1854,  0.9778,  0.0467,  0.0856]], device=&#39;cuda:0&#39;,
           dtype=torch.float64, requires_grad=True), SO3Type LieTensor:
-LieTensor([[ 0.2051, -0.2154,  0.4171,  0.8588],
-           [ 0.6135, -0.6312,  0.2647,  0.3939],
-           [ 0.1477, -0.2664,  0.9004,  0.3106]], device=&#39;cuda:0&#39;,
+LieTensor([[-0.6752, -0.2354, -0.5144,  0.4733],
+           [ 0.0401, -0.1291, -0.2195,  0.9662],
+           [ 0.1854,  0.9778,  0.0467,  0.0856]], device=&#39;cuda:0&#39;,
           grad_fn=&lt;AliasBackward0&gt;))
 </pre></div>
 </div>
@@ -421,17 +423,17 @@ See the doc of
 for the math.</p>
 <p><code class="docutils literal notranslate"><span class="pre">LieTensor.Inv</span></code> gives us the inversion of a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code>.
 Assume you have a <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> of <code class="docutils literal notranslate"><span class="pre">pypose.so3_type</span></code>
-representing a rotation <span class="math notranslate nohighlight">\(R\)</span>, the <cite>Inv</cite> will give you <span class="math notranslate nohighlight">\(R^{-1}\)</span>.
+representing a rotation <span class="math notranslate nohighlight">\({\rm R}\)</span>, the <cite>Inv</cite> will give you <span class="math notranslate nohighlight">\({\rm R^{-1}}\)</span>.
 See <a class="reference external" href="https://pypose.org/docs/main/generated/pypose.Inv/">LieTensor.Inv</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="o">.</span><span class="n">Exp</span><span class="p">())</span><span class="o">.</span><span class="n">Inv</span><span class="p">()</span><span class="o">.</span><span class="n">Log</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>se3Type LieTensor:
-LieTensor([[[ 1.5375, -0.9997,  0.8386, -0.0100,  0.5473,  1.0149],
-            [ 1.2607, -0.3279, -2.2532,  0.4546, -0.3020, -0.2535]],
+LieTensor([[[ 2.6034,  0.1131,  0.7638,  0.5181,  0.5008, -0.4294],
+            [ 0.8536,  0.7519,  0.4739, -0.7229, -2.2891, -0.2145]],
 
-           [[ 0.7564,  0.0112, -0.9919,  0.8431,  1.2986,  0.4500],
-            [ 0.2493, -1.6187,  0.4859,  1.7117, -0.2403, -2.2933]]])
+           [[ 0.0689, -0.9770,  0.1680, -0.3129,  0.1002,  1.4849],
+            [ 2.0900,  0.3519, -1.4629, -1.0783,  0.3289, -0.1629]]])
 </pre></div>
 </div>
 </section>
@@ -453,7 +455,7 @@ See <a class="reference external" href="https://pypose.org/docs/main/generated/p
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(True)
-tensor(True)
+tensor(False)
 </pre></div>
 </div>
 </section>
@@ -477,15 +479,15 @@ That’s it. Exactly the same with PyTorch.</p>
 <span class="n">loss</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor(0.1293, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;), tensor([[-0.0246, -0.2546, -0.0546],
-        [-0.2664, -0.4742,  0.0721],
-        [ 0.1249, -0.1636,  0.3236]], device=&#39;cuda:0&#39;), so3Type LieTensor:
-LieTensor([[-0.0123, -0.1273, -0.0273],
-           [-0.1332, -0.2375,  0.0361],
-           [ 0.0624, -0.0818,  0.1618]], device=&#39;cuda:0&#39;, requires_grad=True), so3Type LieTensor:
-LieTensor([[-0.0123, -0.1273, -0.0273],
-           [-0.1332, -0.2375,  0.0361],
-           [ 0.0624, -0.0818,  0.1618]], device=&#39;cuda:0&#39;))
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor(0.1022, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;), tensor([[-0.0089, -0.0228,  0.1347],
+        [-0.2086,  0.5197, -0.2391],
+        [ 0.0488, -0.0578,  0.1111]], device=&#39;cuda:0&#39;), so3Type LieTensor:
+LieTensor([[-0.0045, -0.0114,  0.0673],
+           [-0.1043,  0.2605, -0.1195],
+           [ 0.0244, -0.0289,  0.0555]], device=&#39;cuda:0&#39;, requires_grad=True), so3Type LieTensor:
+LieTensor([[-0.0045, -0.0114,  0.0673],
+           [-0.1043,  0.2605, -0.1195],
+           [ 0.0244, -0.0289,  0.0555]], device=&#39;cuda:0&#39;))
 </pre></div>
 </div>
 </section>
@@ -507,7 +509,7 @@ First of all, we define our <code class="docutils literal notranslate"><span cla
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">Exp</span><span class="p">()</span> <span class="o">*</span> <span class="n">x</span>
 </pre></div>
 </div>
-<p>Still, like PyTorch, we instantiate our network, optimizer, and scheduler.
+<p>Like PyTorch, we instantiate our network, optimizer, and scheduler.
 Scheduler here is to control the learning rate, see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.MultiStepLR.html#torch.optim.lr_scheduler.MultiStepLR">lr_scheduler.MultiStepLR</a>
 for more detail.</p>
 <p>Then, inside the loop, we run our training. If you are not familiar with the training process,
@@ -537,30 +539,30 @@ we would recommand you reading one of the PyTorch tutorial, like
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Before Optimization:
  so3Type Parameter:
 Parameter containing:
-Parameter(Parameter([[-1.0932,  0.6201,  0.3906],
-           [ 0.5888, -1.3267, -0.2974],
-           [-0.0016, -1.0033, -0.0606],
-           [-0.0032,  1.0669,  0.4715]], device=&#39;cuda:0&#39;, requires_grad=True))
-tensor(6.8490, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.9281, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(7.1159, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.7220, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
-tensor(6.5742, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+Parameter(Parameter([[-0.9898,  1.6808,  0.7223],
+           [-1.5982, -0.8793, -0.1578],
+           [ 1.7135,  1.6453,  0.6028],
+           [ 0.8702, -0.3195,  0.1910]], device=&#39;cuda:0&#39;, requires_grad=True))
+tensor(6.2403, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.8132, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.6270, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.5409, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
+tensor(6.4809, device=&#39;cuda:0&#39;, grad_fn=&lt;SumBackward0&gt;)
 Parameter: 12
 After Optimization:
  so3Type Parameter:
 Parameter containing:
-Parameter(Parameter([[-1.2404,  0.2911, -1.0038],
-           [ 0.3142,  0.0660, -0.0524],
-           [ 0.1719,  0.0582,  0.6686],
-           [ 0.3513, -0.2216,  0.9893]], device=&#39;cuda:0&#39;, requires_grad=True))
+Parameter(Parameter([[ 0.2627,  1.0848,  0.5097],
+           [-1.0950, -0.4968, -0.1819],
+           [ 0.0268,  1.8367,  0.3808],
+           [-0.1493,  0.1611, -0.7862]], device=&#39;cuda:0&#39;, requires_grad=True))
 </pre></div>
 </div>
 <p>And then we are finished with our <code class="docutils literal notranslate"><span class="pre">LieTensor</span></code> tutorial.
 Hopefully you are more familiar with it by now.</p>
 <p>Now you may be free to explore other tutorials.
 See How PyPose can be utilized in real robotics applications.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.072 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.049 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-lietensor-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b01f90f90e79163ca99d3a635e8f24f5/lietensor_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">lietensor_tutorial.py</span></code></a></p>
