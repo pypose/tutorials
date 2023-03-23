@@ -11603,7 +11603,7 @@ article.pytorch-article .tutorials-callout-container .btn.callout-button a {
 }
 @media screen and (min-width: 1101px) {
   .pytorch-container {
-    margin-left: 25%;
+    margin-left: 20%;
   }
 }
 @media screen and (min-width: 1600px) {
@@ -11670,7 +11670,7 @@ article.pytorch-article .tutorials-callout-container .btn.callout-button a {
   .pytorch-content-left {
     margin-top: 0;
     margin-left: 3%;
-    width: 75%;
+    width: 70%;
     float: left;
   }
 }
@@ -11700,14 +11700,14 @@ article.pytorch-article .tutorials-callout-container .btn.callout-button a {
   .pytorch-content-right {
     display: block;
     margin-left: 0;
-    width: 19%;
+    width: 27%;
     float: left;
     height: 100%;
   }
 }
 @media screen and (min-width: 1600px) {
   .pytorch-content-right {
-    width: 280px;
+    width: 380px;
   }
 }
 
@@ -11751,7 +11751,7 @@ article.pytorch-article .tutorials-callout-container .btn.callout-button a {
     overflow-y: hidden;
     padding-bottom: 110px;
     padding: 0 1.875rem 0 0;
-    width: 25%;
+    width: 20%;
     z-index: 200;
     float: left;
   }
@@ -12214,10 +12214,10 @@ article.pytorch-article .tutorials-callout-container .btn.callout-button a {
   .pytorch-page-level-bar.left-menu-is-fixed {
     position: fixed;
     top: 0;
-    left: 25%;
+    left: 20%;
     padding-left: 0;
     right: 0;
-    width: 75%;
+    width: 70%;
   }
 }
 @media screen and (min-width: 1600px) {

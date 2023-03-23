@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Computation times &mdash; PyPose Tutorials  documentation</title>
+  <title>Get Started Tutorial &mdash; PyPose Tutorials  documentation</title>
   
 
   
@@ -36,6 +36,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cartpole Tutorial" href="../dynamics/cartpole_tutorial.html" />
+    <link rel="prev" title="LieTensor Tutorial" href="lietensor_tutorial.html" />
   <!-- Google Analytics -->
   
   <!-- End Google Analytics -->
@@ -152,9 +154,9 @@
             
             
               <p class="caption" role="heading"><span class="caption-text">Introduction to PyPose</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lietensor_tutorial.html">LieTensor Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="get_started_tutorial.html">Get Started Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Get Started Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dynamics</span></p>
 <ul>
@@ -210,13 +212,13 @@
       </li>
 
         
-      <li>Computation times</li>
+      <li>Get Started Tutorial</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/beginner/sg_execution_times.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/beginner/get_started_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -238,7 +240,7 @@
         
 
           <div class="pytorch-call-to-action-links">
-            <div id="tutorial-type">beginner/sg_execution_times</div>
+            <div id="tutorial-type">beginner/get_started_tutorial</div>
 
             <div id="google-colab-link">
               <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
@@ -264,26 +266,128 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="computation-times">
-<span id="sphx-glr-beginner-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">¶</a></h1>
-<p><strong>00:01.903</strong> total execution time for <strong>beginner</strong> files:</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 81%" />
-<col style="width: 11%" />
-<col style="width: 8%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="get_started_tutorial.html#sphx-glr-beginner-get-started-tutorial-py"><span class="std std-ref">Get Started Tutorial</span></a> (<code class="docutils literal notranslate"><span class="pre">get_started_tutorial.py</span></code>)</p></td>
-<td><p>00:01.828</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="lietensor_tutorial.html#sphx-glr-beginner-lietensor-tutorial-py"><span class="std std-ref">LieTensor Tutorial</span></a> (<code class="docutils literal notranslate"><span class="pre">lietensor_tutorial.py</span></code>)</p></td>
-<td><p>00:00.075</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-beginner-get-started-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="get-started-tutorial">
+<span id="sphx-glr-beginner-get-started-tutorial-py"></span><h1>Get Started Tutorial<a class="headerlink" href="#get-started-tutorial" title="Permalink to this heading">¶</a></h1>
+<p>Uncomment this if you’re using google colab to run this script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install pypose</span>
+</pre></div>
+</div>
+<section id="sample-code-of-lietensor">
+<h2>Sample Code of LieTensor<a class="headerlink" href="#sample-code-of-lietensor" title="Permalink to this heading">¶</a></h2>
+<p>The following code sample shows how to rotate random
+points and compute the gradient of batched rotation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
+</pre></div>
+</div>
+<p>Create a random so(3) LieTensor</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_so3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>so3Type LieTensor:
+LieTensor([[ 0.2227, -0.3219, -0.3363],
+           [-0.6982, -0.3682, -0.3169]], requires_grad=True)
+</pre></div>
+</div>
+<p>Get the Lie Group of the Lie Algebra</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">Exp</span><span class="p">()</span> <span class="c1"># Equivalent to: R = pp.Exp(r)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>SO3Type LieTensor:
+LieTensor([[ 0.1101, -0.1592, -0.1663,  0.9669],
+           [-0.3387, -0.1786, -0.1537,  0.9109]], grad_fn=&lt;AliasBackward0&gt;)
+</pre></div>
+</div>
+<p>Create a random point and rotate it based on the Lie Group rotation tensor</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">R</span> <span class="o">@</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># Rotate random point</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[-0.6147, -1.4090,  1.9762],
+        [-0.4468,  0.7588,  2.3438]], grad_fn=&lt;ViewBackward0&gt;)
+</pre></div>
+</div>
+<p>Compute the gradient and print it</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span> <span class="c1"># Compute gradient</span>
+<span class="n">r</span><span class="o">.</span><span class="n">grad</span> <span class="c1"># Print gradient</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[-3.6060,  2.1054,  1.1129],
+        [-2.0774,  2.5985,  0.1027]])
+</pre></div>
+</div>
+</section>
+<section id="sample-code-of-optimizer">
+<h2>Sample code of optimizer<a class="headerlink" href="#sample-code-of-optimizer" title="Permalink to this heading">¶</a></h2>
+<p>We show how to estimate batched transform inverse by a
+2nd-order optimizer. Two usage options for a scheduler
+are provided, each of which can work independently.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch</span><span class="o">,</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
+<span class="kn">from</span> <span class="nn">pypose.optim</span> <span class="kn">import</span> <span class="n">LM</span>
+<span class="kn">from</span> <span class="nn">pypose.optim.strategy</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">pypose.optim.scheduler</span> \
+<span class="kn">import</span> <span class="nn">StopOnPlateau</span>
+
+<span class="k">class</span> <span class="nc">InvNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">dim</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">init</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_SE3</span><span class="p">(</span><span class="o">*</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pose</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pose</span> <span class="o">@</span> <span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="n">Log</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">error</span><span class="o">.</span><span class="n">tensor</span><span class="p">()</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">randn_SE3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">invnet</span> <span class="o">=</span> <span class="n">InvNet</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">damping</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">LM</span><span class="p">(</span><span class="n">invnet</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">)</span>
+<span class="n">scheduler</span> <span class="o">=</span> <span class="n">StopOnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span>
+                          <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                          <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                          <span class="n">decreasing</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+                          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 1st option, full optimization</span>
+<span class="n">scheduler</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">)</span>
+
+<span class="c1"># 2nd option, step optimization</span>
+<span class="k">while</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">continual</span><span class="p">():</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>StopOnPlateau on step 0 Loss 3.491947e+01 --&gt; Loss 1.963101e-06 (reduction/loss: 1.0000e+00).
+StopOnPlateau on step 1 Loss 1.963101e-06 --&gt; Loss 1.194070e-13 (reduction/loss: 1.0000e+00).
+StopOnPlateau on step 2 Loss 1.194070e-13 --&gt; Loss 1.065370e-13 (reduction/loss: 1.0778e-01).
+StopOnPlateau on step 3 Loss 1.065370e-13 --&gt; Loss 5.321509e-17 (reduction/loss: 9.9950e-01).
+StopOnPlateau: Maximum patience steps reached, Quiting..
+</pre></div>
+</div>
+<p>And then we are finished with the two sample codes mentioned in our paper.</p>
+<p>Now you may be free to explore other tutorials.
+See How PyPose can be utilized in real robotics applications.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.828 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-get-started-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/348de6a029b95ff73cf908db38ce1103/get_started_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">get_started_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b0d2cc94a2fb4395d34abc1ca0a4a12d/get_started_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">get_started_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
 </section>
 
 
@@ -291,6 +395,15 @@
              
             </div>
             <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dynamics/cartpole_tutorial.html" class="btn btn-neutral float-right" title="Cartpole Tutorial" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="lietensor_tutorial.html" class="btn btn-neutral" title="LieTensor Tutorial" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
   
 
   

@@ -13,6 +13,23 @@ This is a gallery of beginner's tutorial for pypose.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Get Started Tutorial">
+
+.. only:: html
+
+  .. image:: /beginner/images/thumb/sphx_glr_get_started_tutorial_thumb.png
+    :alt: Get Started Tutorial
+
+  :ref:`sphx_glr_beginner_get_started_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Get Started Tutorial</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="LieTensor Tutorial">
 
 .. only:: html
@@ -36,6 +53,7 @@ This is a gallery of beginner's tutorial for pypose.
 .. toctree::
    :hidden:
 
+   /beginner/get_started_tutorial
    /beginner/lietensor_tutorial
 
 

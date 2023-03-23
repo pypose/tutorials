@@ -125,7 +125,7 @@
               
               
                 <div class="version">
-                  0.1.5
+                  0.3.6
                 </div>
               
             
@@ -156,6 +156,7 @@
               <p class="caption" role="heading"><span class="caption-text">Introduction to PyPose</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/lietensor_tutorial.html">LieTensor Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/get_started_tutorial.html">Get Started Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dynamics</span></p>
 <ul class="current">
@@ -165,8 +166,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pose Graph Optimization</span></p>
 <ul>
@@ -272,42 +273,42 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="floquet-tutorial">
 <span id="sphx-glr-dynamics-floquet-tutorial-py"></span><h1>Floquet Tutorial<a class="headerlink" href="#floquet-tutorial" title="Permalink to this heading">¶</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pypose.module.dynamics</span> <span class="kn">import</span> <span class="n">System</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span><span class="o">,</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <p>We consider a Floquet system, which is periodic and an example of time-varying systems</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Floquet</span><span class="p">(</span><span class="n">System</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Floquet</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">NLS</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Floquet system is periodic and time-varying.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Floquet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">state_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="n">cc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">t</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
-        <span class="n">ss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">t</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
-            <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="n">cc</span><span class="o">/</span><span class="mi">10</span><span class="p">],</span>
-            <span class="p">[</span><span class="n">cc</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]])</span>
-        <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
-            <span class="p">[</span><span class="n">ss</span><span class="p">],</span>
-            <span class="p">[</span><span class="mf">1.</span><span class="p">]])</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">cos</span><span class="p">()</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span>   <span class="mf">1.</span><span class="p">,</span>  <span class="n">cc</span><span class="o">/</span><span class="mi">10</span><span class="p">],</span>
+                          <span class="p">[</span><span class="n">cc</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>     <span class="mf">1.</span><span class="p">]],</span> <span class="n">device</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">ss</span><span class="p">],</span>
+                          <span class="p">[</span><span class="mf">1.</span><span class="p">]],</span> <span class="n">device</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">state</span> <span class="o">+</span> <span class="n">B</span> <span class="o">@</span> <span class="nb">input</span>
 
     <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">state</span> <span class="o">+</span> <span class="n">t</span>
 
-<span class="k">def</span> <span class="nf">createTimePlot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;Un-named plot&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">f</span>
+
+<span class="k">def</span> <span class="nf">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -317,84 +318,73 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p>Time, Input, Initial state</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">time</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">time</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">obser</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create dynamics solver object</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">solver</span> <span class="o">=</span> <span class="n">Floquet</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Floquet</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Calculate trajectory</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">state_all</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">state_all</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
-<span class="n">obser_all</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">state_all</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">obser_all</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">state_all</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>Create time plots to show dynamics</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">ax</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">state_all</span><span class="p">[:,</span><span class="n">_i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;pp&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;State </span><span class="si">{</span><span class="n">_i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">ax</span><span class="p">[</span><span class="n">_i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">obser_all</span><span class="p">[:,</span><span class="n">_i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;pp&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="p">[</span><span class="n">_i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Observation </span><span class="si">{</span><span class="n">_i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_floquet_tutorial_001.png" srcset="../_images/sphx_glr_floquet_tutorial_001.png" alt="floquet tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend object at 0x7efbd80c7070&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">state</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">obser</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Jacobian computation - Find jacobians at the last step</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;c2&#39;</span><span class="p">]</span>
-<span class="n">solver</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">()</span>
-<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">_v</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">_v</span><span class="p">))</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">]</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">()</span>
+<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/tianhao/twu3/pypose/pypose/module/dynamics.py:198: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  self._ref_state = torch.tensor(self.state) if state is None else torch.atleast_1d(state)
-/home/tianhao/twu3/pypose/pypose/module/dynamics.py:199: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  self._ref_input = torch.tensor(self.input) if input is None else torch.atleast_1d(input)
-A tensor([[1.0000, 0.1000],
-        [0.1000, 1.0000]])
-B tensor([[1.7485e-07],
-        [1.0000e+00]])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>A tensor([[1.0000, 0.0998],
+        [0.0998, 1.0000]], device=&#39;cuda:0&#39;)
+B tensor([[-0.0628],
+        [ 1.0000]], device=&#39;cuda:0&#39;)
 C tensor([[1., 0.],
-        [0., 1.]])
+        [0., 1.]], device=&#39;cuda:0&#39;)
 D tensor([[0.],
-        [0.]])
-c1 tensor([ 2.1914e-08, -1.4901e-08])
-c2 tensor([100., 100.])
+        [0.]], device=&#39;cuda:0&#39;)
+c1 tensor([ 2.9802e-08, -1.4901e-08], device=&#39;cuda:0&#39;)
+c2 tensor([99., 99.], device=&#39;cuda:0&#39;)
 
 [None, None, None, None, None, None]
 </pre></div>
 </div>
 <p>Jacobian computation - Find jacobians at the 5th step</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">solver</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state_all</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
-<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">_v</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">_v</span><span class="p">))</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">]</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>A tensor([[1.0000, 0.0951],
-        [0.0951, 1.0000]])
+        [0.0951, 1.0000]], device=&#39;cuda:0&#39;)
 B tensor([[0.3090],
-        [1.0000]])
+        [1.0000]], device=&#39;cuda:0&#39;)
 C tensor([[1., 0.],
-        [0., 1.]])
+        [0., 1.]], device=&#39;cuda:0&#39;)
 D tensor([[0.],
-        [0.]])
-c1 tensor([-1.4901e-08,  0.0000e+00])
-c2 tensor([5., 5.])
+        [0.]], device=&#39;cuda:0&#39;)
+c1 tensor([-1.4901e-08,  0.0000e+00], device=&#39;cuda:0&#39;)
+c2 tensor([5., 5.], device=&#39;cuda:0&#39;)
+
+[None, None, None, None, None, None]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.080 seconds)</p>
+<p>Create time plots to show dynamics</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">state</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;State[0]&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">state</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;State[1]&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">obser</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Observe[0]&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">obser</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Observe[1]&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_floquet_tutorial_001.png" srcset="../_images/sphx_glr_floquet_tutorial_001.png" alt="floquet tutorial" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.101 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-dynamics-floquet-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/58213811c9714b989cbf9369657d220c/floquet_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">floquet_tutorial.py</span></code></a></p>
@@ -459,17 +449,7 @@ c2 tensor([5., 5.])
 
         <div class="pytorch-content-right" id="pytorch-content-right">
           <div class="pytorch-right-menu" id="pytorch-right-menu">
-            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Floquet Tutorial</a><ul>
-<li><a class="reference internal" href="#preparation">Preparation</a></li>
-<li><a class="reference internal" href="#number-of-time-steps">Number of time steps</a></li>
-</ul>
-</li>
-</ul>
-
-              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
-            </div>
+            <a class="twitter-timeline" data-chrome="noborders" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org<br>You need VPN if you see this.</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
           </div>
         </div>
       </section>

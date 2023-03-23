@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**00:00.376** total execution time for **dynamics** files:
+**00:00.398** total execution time for **dynamics** files:
 
 +----------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_dynamics_cartpole_tutorial.py` (``cartpole_tutorial.py``)   | 00:00.169 | 0.0 MB |
+| :ref:`sphx_glr_dynamics_cartpole_tutorial.py` (``cartpole_tutorial.py``)   | 00:00.170 | 0.0 MB |
 +----------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_dynamics_neuralnet_tutorial.py` (``neuralnet_tutorial.py``) | 00:00.127 | 0.0 MB |
+| :ref:`sphx_glr_dynamics_neuralnet_tutorial.py` (``neuralnet_tutorial.py``) | 00:00.126 | 0.0 MB |
 +----------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_dynamics_floquet_tutorial.py` (``floquet_tutorial.py``)     | 00:00.080 | 0.0 MB |
+| :ref:`sphx_glr_dynamics_floquet_tutorial.py` (``floquet_tutorial.py``)     | 00:00.101 | 0.0 MB |
 +----------------------------------------------------------------------------+-----------+--------+

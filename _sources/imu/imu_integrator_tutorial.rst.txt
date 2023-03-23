@@ -605,7 +605,7 @@ In the IMUCorrector tutorial, we will see an example of how we can correct this.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.770 seconds)
+   **Total running time of the script:** ( 0 minutes  5.191 seconds)
 
 
 .. _sphx_glr_download_imu_imu_integrator_tutorial.py:

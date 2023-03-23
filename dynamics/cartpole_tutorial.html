@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Floquet Tutorial" href="floquet_tutorial.html" />
-    <link rel="prev" title="LieTensor Tutorial" href="../beginner/lietensor_tutorial.html" />
+    <link rel="prev" title="Get Started Tutorial" href="../beginner/get_started_tutorial.html" />
   <!-- Google Analytics -->
   
   <!-- End Google Analytics -->
@@ -125,7 +125,7 @@
               
               
                 <div class="version">
-                  0.1.5
+                  0.3.6
                 </div>
               
             
@@ -156,6 +156,7 @@
               <p class="caption" role="heading"><span class="caption-text">Introduction to PyPose</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/lietensor_tutorial.html">LieTensor Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/get_started_tutorial.html">Get Started Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Dynamics</span></p>
 <ul class="current">
@@ -165,8 +166,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">IMU</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../imu/imu_integrator_tutorial.html">IMU Integrator Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../imu/imu_corrector_tutorial.html">IMU Corrector Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Pose Graph Optimization</span></p>
 <ul>
@@ -272,19 +273,18 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="cartpole-tutorial">
 <span id="sphx-glr-dynamics-cartpole-tutorial-py"></span><h1>Cartpole Tutorial<a class="headerlink" href="#cartpole-tutorial" title="Permalink to this heading">¶</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pypose.module.dynamics</span> <span class="kn">import</span> <span class="n">System</span>
-<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span><span class="o">,</span> <span class="nn">pypose</span> <span class="k">as</span> <span class="nn">pp</span>
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
 <p>Create class for cart-pole dynamics</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CartPole</span><span class="p">(</span><span class="n">System</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CartPole</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">NLS</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">cartmass</span><span class="p">,</span> <span class="n">polemass</span><span class="p">,</span> <span class="n">gravity</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CartPole</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">dt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cartmass</span> <span class="o">=</span> <span class="n">cartmass</span>
@@ -293,11 +293,11 @@ to download the full example code</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">polemassLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">polemass</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cartmass</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">polemass</span>
 
-    <span class="k">def</span> <span class="nf">state_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">state_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">xDot</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">thetaDot</span> <span class="o">=</span> <span class="n">state</span>
         <span class="n">force</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-        <span class="n">costheta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-        <span class="n">sintheta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">costheta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">cos</span><span class="p">()</span>
+        <span class="n">sintheta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">sin</span><span class="p">()</span>
 
         <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">force</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">polemassLength</span> <span class="o">*</span> <span class="n">thetaDot</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sintheta</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">totalMass</span>
 
@@ -308,18 +308,18 @@ to download the full example code</p>
 
         <span class="n">_dstate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">xDot</span><span class="p">,</span> <span class="n">xAcc</span><span class="p">,</span> <span class="n">thetaDot</span><span class="p">,</span> <span class="n">thetaAcc</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">state</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">_dstate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span> <span class="o">+</span> <span class="n">_dstate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
 
-    <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">state</span>
 
-<span class="k">def</span> <span class="nf">createTimePlot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;Un-named plot&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">f</span>
+
+<span class="k">def</span> <span class="nf">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -334,58 +334,64 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p>Time and input</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
 <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Initial state</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create dynamics solver object</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cartPoleSolver</span> <span class="o">=</span> <span class="n">CartPole</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">len</span><span class="p">,</span> <span class="n">m_cart</span><span class="p">,</span> <span class="n">m_pole</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">CartPole</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">len</span><span class="p">,</span> <span class="n">m_cart</span><span class="p">,</span> <span class="n">m_pole</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Calculate trajectory</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">state_all</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-<span class="n">state_all</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">state</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">state</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Jacobian computation - Find jacobians at the last step</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;c2&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>A tensor([[ 1.0000e+00,  1.0000e-02,  0.0000e+00,  0.0000e+00],
+        [ 0.0000e+00,  1.0000e+00, -3.2700e-02, -3.4183e-07],
+        [ 0.0000e+00,  0.0000e+00,  1.0000e+00,  1.0000e-02],
+        [ 0.0000e+00,  0.0000e+00, -6.5400e-02,  1.0000e+00]], device=&#39;cuda:0&#39;,
+       dtype=torch.float64)
+B tensor([[0.0000],
+        [0.0004],
+        [0.0000],
+        [0.0002]], device=&#39;cuda:0&#39;)
+C tensor([[1., 0., 0., 0.],
+        [0., 1., 0., 0.],
+        [0., 0., 1., 0.],
+        [0., 0., 0., 1.]], device=&#39;cuda:0&#39;, dtype=torch.float64)
+D tensor([[0.],
+        [0.],
+        [0.],
+        [0.]], device=&#39;cuda:0&#39;)
+c1 tensor([0.0000, 0.1027, 0.0000, 0.2055], device=&#39;cuda:0&#39;, dtype=torch.float64)
+c2 tensor([0., 0., 0., 0.], device=&#39;cuda:0&#39;, dtype=torch.float64)
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">state_all</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="p">(</span><span class="n">state_all</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+[None, None, None, None, None, None]
 </pre></div>
 </div>
 <p>Create time plots to show dynamics</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">xdot</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">thetadot</span> <span class="o">=</span> <span class="n">state_all</span><span class="o">.</span><span class="n">T</span>
-<span class="n">x_fig</span> <span class="o">=</span> <span class="n">createTimePlot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span><span class="s2">&quot;x Plot&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;x Plot&quot;</span><span class="p">)</span>
-<span class="n">xdot_fig</span> <span class="o">=</span> <span class="n">createTimePlot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">xdot</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;x dot Plot&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;x dot&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;x dot Plot&quot;</span><span class="p">)</span>
-<span class="n">theta_fig</span> <span class="o">=</span> <span class="n">createTimePlot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;theta Plot&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;theta Plot&quot;</span><span class="p">)</span>
-<span class="n">thetadot_fig</span> <span class="o">=</span> <span class="n">createTimePlot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">thetadot</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;theta dot Plot&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;theta dot&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;theta dot Plot&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_cartpole_tutorial_001.png" srcset="../_images/sphx_glr_cartpole_tutorial_001.png" alt="x Plot" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_cartpole_tutorial_002.png" srcset="../_images/sphx_glr_cartpole_tutorial_002.png" alt="x dot Plot" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_cartpole_tutorial_003.png" srcset="../_images/sphx_glr_cartpole_tutorial_003.png" alt="theta Plot" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_cartpole_tutorial_004.png" srcset="../_images/sphx_glr_cartpole_tutorial_004.png" alt="theta dot Plot" class = "sphx-glr-multi-img"/></li>
-</ul>
-<p>Jacobian computation - Find jacobians at the last step</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jacob_state</span><span class="p">,</span> <span class="n">jacob_input</span> <span class="o">=</span> <span class="n">state_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">set_refpoint</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">jacob_state</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">jacob_input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">A</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">B</span>
-<span class="n">C</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">C</span>
-<span class="n">D</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">D</span>
-<span class="n">c1</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">c1</span>
-<span class="n">c2</span> <span class="o">=</span> <span class="n">cartPoleSolver</span><span class="o">.</span><span class="n">c2</span>
-
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">xdot</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">thetadot</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">T</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">xdot</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;X dot&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Theta&#39;</span><span class="p">)</span>
+<span class="n">subPlot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">time</span><span class="p">,</span> <span class="n">thetadot</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Theta dot&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/tianhao/twu3/tutorials/dynamics_source/cartpole_tutorial.py:105: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matricesor `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2981.)
-  jacob_state, jacob_input = state_all[-1,:].T, input[-1]
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.169 seconds)</p>
+<img src="../_images/sphx_glr_cartpole_tutorial_001.png" srcset="../_images/sphx_glr_cartpole_tutorial_001.png" alt="cartpole tutorial" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.170 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-dynamics-cartpole-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/88cd5fd09e7e92228d1d7738203bee59/cartpole_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">cartpole_tutorial.py</span></code></a></p>
@@ -409,7 +415,7 @@ to download the full example code</p>
         <a href="floquet_tutorial.html" class="btn btn-neutral float-right" title="Floquet Tutorial" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../beginner/lietensor_tutorial.html" class="btn btn-neutral" title="LieTensor Tutorial" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../beginner/get_started_tutorial.html" class="btn btn-neutral" title="Get Started Tutorial" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -450,17 +456,7 @@ to download the full example code</p>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
           <div class="pytorch-right-menu" id="pytorch-right-menu">
-            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Cartpole Tutorial</a><ul>
-<li><a class="reference internal" href="#preparation">Preparation</a></li>
-<li><a class="reference internal" href="#create-parameters-for-cart-pole-trajectory">Create parameters for cart pole trajectory</a></li>
-</ul>
-</li>
-</ul>
-
-              <!-- <a class="twitter-timeline" data-width="15%" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
-            </div>
+            <a class="twitter-timeline" data-chrome="noborders" href="https://twitter.com/pypose_org?ref_src=twsrc%5Etfw">Tweets by pypose_org<br>You need VPN if you see this.</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
           </div>
         </div>
       </section>
