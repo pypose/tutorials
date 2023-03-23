@@ -100,7 +100,7 @@ scheduler = StopOnPlateau(optimizer,
 scheduler.optimize(input=input)
 
 # 2nd option, step optimization
-while scheduler.continual:
+while scheduler.continual():
     loss = optimizer.step(input)
     scheduler.step(loss)
 
