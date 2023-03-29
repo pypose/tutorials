@@ -351,11 +351,7 @@ are provided, each of which can work independently.</p>
 <span class="n">invnet</span> <span class="o">=</span> <span class="n">InvNet</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="n">strategy</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">damping</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">LM</span><span class="p">(</span><span class="n">invnet</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">)</span>
-<span class="n">scheduler</span> <span class="o">=</span> <span class="n">StopOnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span>
-                          <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                          <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                          <span class="n">decreasing</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-                          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">scheduler</span> <span class="o">=</span> <span class="n">StopOnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">, </span><span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">, </span><span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">, </span><span class="n">decreasing</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">, </span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>        
 
 <span class="c1"># 1st option, full optimization</span>
 <span class="n">scheduler</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">)</span>
