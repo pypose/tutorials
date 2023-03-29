@@ -197,8 +197,7 @@ are provided, each of which can work independently.
     import torch, pypose as pp
     from pypose.optim import LM
     from pypose.optim.strategy import Constant
-    from pypose.optim.scheduler \
-    import StopOnPlateau
+    from pypose.optim.scheduler import StopOnPlateau
 
     class InvNet(nn.Module):
 
