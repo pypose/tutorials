@@ -10,7 +10,7 @@ Welcome to Pypose Tutorials
    :maxdepth: 2
    :caption: Introduction to PyPose
    
-   beginner/get_started_tutorial
+   beginner/started
    beginner/lietensor_tutorial
 
 .. toctree::
