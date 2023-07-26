@@ -10,11 +10,15 @@ import numpy as np
 import pypose as pp
 from datetime import datetime
 import torch.utils.data as Data
-
+from torchvision.datasets.utils import download_and_extract_archive
 
 class KITTI_IMU(Data.Dataset):
-    def __init__(self, root, dataname, drive, duration=10, step_size=1, mode='train'):
+    datalink = 'https://github.com/pypose/pypose/releases/download/v0.2.2/2011_09_26.zip'
+    def __init__(self, root, dataname, drive, duration=10, step_size=1, mode='train',
+                 download=True):
         super().__init__()
+        if download:
+            download_and_extract_archive(self.datalink, root)
         self.duration = duration
         self.data = pykitti.raw(root, dataname, drive)
         self.seq_len = len(self.data.timestamps) - 1
