@@ -160,7 +160,7 @@ print((b.Exp() * X - X * a.Exp()).abs().mean() < 1e-7)
 
 
 ######################################################################
-# 5. Grdients
+# 5. Gradients
 # ---------------------------------------
 # As mentioned at the beginning, we would want to utilize the powerful
 # network training API the comes with PyTorch.
